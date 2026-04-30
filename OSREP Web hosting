@@ -3,690 +3,574 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>osrep.ai — constant state machine monitoring</title>
+<title>osrep.ai — One state. Every sensor. No cloud.</title>
+<meta name="description" content="OSREP deploys hardened edge processing units at your assets. They ingest every sensor already wired to your equipment, run all inference on-unit, and return a single continuous state — no raw data leaves the machine.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://osrep.ai/">
+<meta name="theme-color" content="#080A0B">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://osrep.ai/">
+<meta property="og:title" content="osrep.ai — One state. Every sensor. No cloud.">
+<meta property="og:description" content="Hardened edge processing units that ingest your existing sensors, run all inference on-unit, and return a single continuous machine state. No raw data leaves the asset.">
+<meta property="og:image" content="https://osrep.ai/og-image.png">
+<meta property="og:site_name" content="osrep.ai">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="osrep.ai — One state. Every sensor. No cloud.">
+<meta name="twitter:description" content="Hardened edge processing units. Multi-sensor ingestion. On-unit inference. One continuous machine state.">
+<meta name="twitter:image" content="https://osrep.ai/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"Osrep","url":"https://osrep.ai","description":"Hardened edge processing units for continuous machine state monitoring. Multi-sensor ingestion, on-unit inference, no cloud dependency.","address":{"@type":"PostalAddress","addressLocality":"Baton Rouge","addressRegion":"LA","addressCountry":"US"},"contactPoint":{"@type":"ContactPoint","contactType":"sales","url":"https://osrep.ai/#contact"}}
+</script>
 <style>
-  :root{
-    --bg:#0A0C0D;
-    --bg-1:#0F1214;
-    --bg-2:#14181B;
-    --line:#1E2327;
-    --line-2:#2A3035;
-    --dim:#6B7280;
-    --mid:#9AA1A9;
-    --ink:#E8EAE6;
-    --ink-2:#F6F7F4;
-    --amber:#CA4A0E;
-    --amber-dim:#6E2908;
-    --cyan:#4CC9F0;
-    --red:#FF5C5C;
-    --green:#4ADE80;
-    --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
-    --display:'Space Grotesk', 'JetBrains Mono', sans-serif;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
-  body{
-    background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(202,74,14,.06), transparent 60%),
-      radial-gradient(900px 500px at 0% 20%, rgba(76,201,240,.04), transparent 60%),
-      var(--bg);
-    background-attachment: fixed;
-  }
-  a{color:inherit;text-decoration:none}
-  ::selection{background:var(--amber);color:#0A0C0D}
+:root{
+  --bg:#080A0B;--bg-1:#0D1012;--bg-2:#121618;
+  --line:#1A1E22;--line-2:#242B30;
+  --dim:#55626B;--mid:#8A959E;--ink:#E2E5E0;--ink-2:#F4F5F2;
+  --amber:#C94A0C;--amber-hi:#E8601E;
+  --cyan:#38B6D4;--red:#F05050;--green:#3DCA74;--yellow:#D4A820;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --display:'Space Grotesk','JetBrains Mono',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{background:radial-gradient(1400px 700px at 75% -8%,rgba(201,74,12,.055),transparent 55%),radial-gradient(800px 500px at 5% 30%,rgba(56,182,212,.035),transparent 55%),var(--bg);background-attachment:fixed}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--amber);color:#080A0B}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.wrap{max-width:1300px;margin:0 auto;padding:0 36px}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:200;opacity:.032;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='1'/></svg>")}
 
-  /* Layout */
-  .wrap{max-width:1280px;margin:0 auto;padding:0 32px}
-  .rule{height:1px;background:var(--line);width:100%}
-  .rule-dash{height:1px;background-image:linear-gradient(to right, var(--line-2) 50%, transparent 50%);background-size:8px 1px}
+/* NAV */
+.nav{position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:rgba(8,10,11,.78);border-bottom:1px solid var(--line)}
+.nav::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--amber) 25%,var(--amber) 75%,transparent);opacity:.35;pointer-events:none}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:54px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600}
+.brand-pulse{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 14px rgba(201,74,12,.9);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.brand-name{font-family:var(--mono);font-size:13px;letter-spacing:.02em}
+.brand-name em{font-style:normal;color:var(--amber)}
+.nav-links{display:flex;gap:32px;font-size:12px;color:var(--mid)}
+.nav-links a{position:relative;padding:4px 0;transition:color .15s}
+.nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:-2px;height:1px;background:var(--amber);transition:right .22s}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a:hover::after{right:0}
+.nav-cta{font-size:11px;padding:7px 13px;border:1px solid var(--line-2);color:var(--ink);transition:all .15s;letter-spacing:.04em}
+.nav-cta:hover{border-color:var(--amber);color:var(--amber)}
 
-  /* Nav */
-  .nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(8px);background:rgba(10,12,13,.72);border-bottom:1px solid var(--line)}
-  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:56px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:600;letter-spacing:-.01em}
-  .brand .logo{width:22px;height:22px;position:relative}
-  .brand-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px rgba(202,74,14,.8);animation:pulse 1.6s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
-  .brand-name{font-family:var(--mono);font-size:14px}
-  .brand-name em{font-style:normal;color:var(--amber)}
-  .nav-links{display:flex;gap:28px;font-size:12px;color:var(--mid)}
-  .nav-links a:hover{color:var(--ink)}
-  .nav-cta{font-size:12px;padding:8px 14px;border:1px solid var(--line-2);color:var(--ink);transition:all .15s ease}
-  .nav-cta:hover{border-color:var(--amber);color:var(--amber)}
-  .status-chip{display:inline-flex;align-items:center;gap:8px;font-size:11px;color:var(--mid);padding:4px 10px;border:1px solid var(--line);border-radius:999px}
-  .status-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(74,222,128,.6)}
+/* HERO */
+.hero{position:relative;padding:80px 0 0;overflow:hidden}
+.hero-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(26,30,34,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(26,30,34,.3) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 60% at 50% 20%,#000 30%,transparent 80%)}
+.hero-orb{position:absolute;width:700px;height:700px;border-radius:50%;top:-180px;right:-160px;background:radial-gradient(circle,rgba(201,74,12,.11),transparent 65%);filter:blur(24px);animation:orbDrift 20s ease-in-out infinite alternate;pointer-events:none;z-index:1}
+@keyframes orbDrift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(-50px,30px) scale(1.06)}}
+.hero-inner{position:relative;z-index:2}
+.kicker{display:inline-flex;align-items:center;gap:12px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:32px}
+.kicker-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:sonar 2.6s ease-out infinite}
+@keyframes sonar{0%{box-shadow:0 0 0 0 rgba(201,74,12,.55)}70%{box-shadow:0 0 0 12px rgba(201,74,12,0)}100%{box-shadow:0 0 0 0 rgba(201,74,12,0)}}
+.kicker em{font-style:normal;color:var(--amber)}
+h1.headline{font-family:var(--display);font-weight:500;font-size:clamp(48px,8vw,112px);line-height:.97;letter-spacing:-.045em;margin:0 0 28px;max-width:15ch;color:var(--ink-2)}
+.hl-accent{background:linear-gradient(108deg,var(--amber) 0%,var(--amber) 38%,var(--amber-hi) 50%,var(--amber) 62%,var(--amber) 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 7s linear infinite}
+@keyframes shimmer{0%{background-position:220% 0}100%{background-position:-220% 0}}
+.sub{font-family:var(--mono);font-size:16px;line-height:1.75;color:var(--mid);max-width:56ch;margin:0 0 40px}
+.sub strong{color:var(--ink);font-weight:500}
+.sub em{font-style:normal;color:var(--amber)}
+.hero-cta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:64px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;font-family:var(--mono);font-size:12px;letter-spacing:.04em;border:1px solid var(--line-2);color:var(--ink);transition:all .22s cubic-bezier(.2,.8,.2,1);cursor:pointer;background:transparent;border-radius:2px;touch-action:manipulation}
+.btn.primary{background:var(--amber);color:#080A0B;border-color:var(--amber);font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+.btn.primary:hover{background:var(--amber-hi);border-color:var(--amber-hi);transform:translateY(-1px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 12px 32px -8px rgba(201,74,12,.5),0 0 0 4px rgba(201,74,12,.1)}
+.btn:not(.primary):hover{border-color:var(--ink);color:var(--ink-2)}
+.btn .arr{transition:transform .18s ease}
+.btn:hover .arr{transform:translateX(3px)}
 
-  /* ---------- HERO ---------- */
-  .hero{position:relative;padding:72px 0 40px;overflow:hidden}
-  .hero::before{
-    content:"";position:absolute;inset:0;pointer-events:none;
-    background-image:
-      linear-gradient(to right, rgba(30,35,39,.35) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(30,35,39,.35) 1px, transparent 1px);
-    background-size:48px 48px;
-    mask-image:radial-gradient(ellipse at 50% 30%, #000 30%, transparent 75%);
-  }
-  .hero-inner{position:relative;z-index:2}
-  .kicker{display:inline-flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mid);margin-bottom:28px}
-  .kicker::before{content:"";width:24px;height:1px;background:var(--amber)}
-  .kicker em{font-style:normal;color:var(--amber);letter-spacing:.18em}
-  h1.headline{
-    font-family:var(--display);
-    font-weight:500;
-    font-size:clamp(40px, 6.2vw, 84px);
-    line-height:1.02;
-    letter-spacing:-.035em;
-    margin:0 0 24px;
-    max-width:16ch;
-    color:var(--ink-2);
-  }
-  h1 .amber{color:var(--amber)}
-  h1 .dim{color:var(--dim)}
-  h1 .slash{color:var(--amber);font-weight:400}
-  .sub{
-    font-family:var(--mono);
-    font-size:16px;line-height:1.65;color:var(--mid);max-width:62ch;margin:0 0 36px;
-  }
-  .sub strong{color:var(--ink);font-weight:500}
-  .hero-cta{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;font-family:var(--mono);font-size:13px;border:1px solid var(--line-2);color:var(--ink);transition:all .15s ease;cursor:pointer;background:transparent}
-  .btn.primary{background:var(--amber);color:#0A0C0D;border-color:var(--amber);font-weight:600}
-  .btn.primary:hover{background:#E35D1F;border-color:#E35D1F;box-shadow:0 0 0 4px rgba(202,74,14,.12)}
-  .btn:hover{border-color:var(--ink);color:var(--ink-2)}
-  .btn .arrow{transition:transform .15s ease}
-  .btn:hover .arrow{transform:translateX(3px)}
+/* DIAGRAM */
+.diagram-wrap{border:1px solid var(--line);background:linear-gradient(180deg,rgba(18,22,24,.9),rgba(8,10,11,.9));position:relative;overflow:hidden}
+.diagram-wrap::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:.5;pointer-events:none}
+.dw-head{display:flex;align-items:stretch;border-bottom:1px solid var(--line);font-size:11px;color:var(--mid);flex-wrap:wrap}
+.dw-hc{padding:9px 16px;border-right:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.dw-hc:last-child{border-right:none;margin-left:auto}
+.dw-lbl{color:var(--dim);text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+.dw-val{color:var(--ink)}
+.dw-val.amber{color:var(--amber)}
+.dw-val.green{color:var(--green)}
+.dw-val.yellow{color:var(--yellow)}
+.dw-val.red{color:var(--red)}
+.dw-body{padding:36px 40px;display:grid;grid-template-columns:1fr 24px auto 48px 200px;align-items:center;gap:0;min-height:240px}
 
-  /* Waveform panel */
-  .scope{
-    margin-top:64px;
-    border:1px solid var(--line);
-    background:linear-gradient(180deg, rgba(20,24,27,.6), rgba(10,12,13,.6));
-    position:relative;
-  }
-  .scope-head{display:flex;align-items:stretch;border-bottom:1px solid var(--line);font-size:11px;color:var(--mid)}
-  .scope-head > div{padding:10px 16px;border-right:1px solid var(--line);display:flex;align-items:center;gap:8px}
-  .scope-head > div:last-child{border-right:none;margin-left:auto}
-  .scope-head .label{color:var(--dim);text-transform:uppercase;letter-spacing:.12em;font-size:10px}
-  .scope-head .val{color:var(--ink)}
-  .scope-head .val.amber{color:var(--amber)}
-  .scope-head .val.cyan{color:var(--cyan)}
-  .scope-head .val.red{color:var(--red)}
-  .scope-body{display:grid;grid-template-columns:1fr 240px;min-height:260px}
-  .scope-canvas{position:relative;border-right:1px solid var(--line)}
-  .scope-canvas canvas{display:block;width:100%;height:100%}
-  .scope-ticks{position:absolute;inset:0;pointer-events:none;display:flex;justify-content:space-between;padding:0 12px;font-size:9px;color:var(--dim);align-items:flex-end}
-  .scope-ticks span{padding-bottom:6px}
-  .scope-anomaly{position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--amber);letter-spacing:.12em;text-transform:uppercase;opacity:0;transition:opacity .3s}
-  .scope-anomaly.on{opacity:1}
-  .scope-side{padding:20px;display:flex;flex-direction:column;gap:10px;font-size:11px;justify-content:center}
-  .illus-note .illus-title{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:10px}
-  .illus-note p{font-size:12px;color:var(--mid);line-height:1.65;margin:0}
-  .illus-note p em{font-style:italic;color:var(--ink)}
+/* Feeds */
+.feeds{display:flex;flex-direction:column;gap:14px}
+.feed{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--mid)}
+.feed-icon{width:30px;height:28px;border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--dim);font-size:9px;letter-spacing:.08em}
+.feed-meta{display:flex;flex-direction:column;gap:1px;width:110px;flex-shrink:0}
+.feed-name{color:var(--ink);font-size:11px}
+.feed-type{color:var(--dim);font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.feed-line{flex:1;height:1px;background:repeating-linear-gradient(90deg,var(--line-2) 0,var(--line-2) 4px,transparent 4px,transparent 8px);position:relative;overflow:hidden}
+.feed-line::after{content:"";position:absolute;right:-1px;top:50%;transform:translate(0,-50%);width:5px;height:5px;border-top:1px solid var(--amber);border-right:1px solid var(--amber);rotate:45deg}
+.feed-line .flow{position:absolute;top:50%;transform:translateY(-50%);width:4px;height:4px;border-radius:50%;background:var(--amber);opacity:0;animation:flowR 2.8s linear infinite}
+.feed:nth-child(1) .flow{animation-delay:0s}
+.feed:nth-child(2) .flow{animation-delay:-.56s}
+.feed:nth-child(3) .flow{animation-delay:-1.12s}
+.feed:nth-child(4) .flow{animation-delay:-1.68s}
+.feed:nth-child(5) .flow{animation-delay:-2.24s}
+@keyframes flowR{0%{left:0;opacity:0}8%{opacity:.85}88%{opacity:.85}100%{left:calc(100% - 4px);opacity:0}}
 
-  /* Stat strip under hero */
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:40px;border:1px solid var(--line);background:var(--bg-1)}
-  .stat{padding:22px;border-right:1px solid var(--line)}
-  .stat:last-child{border-right:none}
-  .stat .k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
-  .stat .v{font-family:var(--display);font-size:28px;font-weight:500;color:var(--ink-2);letter-spacing:-.02em}
-  .stat .v .unit{color:var(--dim);font-size:14px;margin-left:4px}
+/* Connector spine */
+.unit-spine{width:24px;display:flex;flex-direction:column;align-items:center;justify-content:stretch;height:100%}
+.unit-spine::before{content:"";width:1px;flex:1;background:var(--line-2)}
 
-  /* Section header pattern */
-  .section{padding:96px 0;position:relative}
-  .sec-head{display:grid;grid-template-columns:160px 1fr;gap:32px;margin-bottom:56px;align-items:baseline}
-  .sec-index{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
-  .sec-index span{color:var(--dim)}
-  .sec-title{font-family:var(--display);font-size:clamp(28px,3.6vw,48px);font-weight:500;letter-spacing:-.025em;color:var(--ink-2);margin:0;max-width:22ch;line-height:1.1}
-  .sec-lead{font-size:14px;color:var(--mid);max-width:60ch;margin-top:16px}
+/* Unit box */
+.unit-box{border:1px solid var(--amber);padding:24px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;position:relative;background:radial-gradient(ellipse at 50% 0%,rgba(201,74,12,.1),transparent 70%),var(--bg-1);min-width:144px;box-shadow:0 0 0 1px rgba(201,74,12,.07),0 0 40px -10px rgba(201,74,12,.2)}
+.unit-box::before,.unit-box::after{content:"";position:absolute;width:10px;height:10px;border-color:var(--amber);border-style:solid}
+.unit-box::before{top:-1px;left:-1px;border-width:1.5px 0 0 1.5px}
+.unit-box::after{bottom:-1px;right:-1px;border-width:0 1.5px 1.5px 0}
+.unit-lbl{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber)}
+.unit-name{font-family:var(--display);font-size:20px;font-weight:600;color:var(--ink-2);letter-spacing:-.025em;line-height:1}
+.unit-sub{font-size:9px;color:var(--dim);letter-spacing:.08em;text-transform:uppercase;line-height:1.5}
+.unit-active{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(61,202,116,.7);animation:blink 1.8s ease-in-out infinite;margin-top:4px}
 
-  /* Monitor grid */
-  .mon-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:0;border:1px solid var(--line)}
-  .mon{position:relative;padding:28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:220px;display:flex;flex-direction:column;justify-content:space-between;background:var(--bg-1);transition:background .15s}
-  .mon:hover{background:var(--bg-2)}
-  .mon.w-6{grid-column:span 6}
-  .mon.w-4{grid-column:span 4}
-  .mon.w-3{grid-column:span 3}
-  .mon.w-12{grid-column:span 12}
-  .mon:nth-child(3n){border-right:none}
-  .mon-tag{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;align-items:center}
-  .mon-tag .num{color:var(--amber)}
-  .mon h3{font-family:var(--display);font-size:22px;font-weight:500;margin:14px 0 8px;letter-spacing:-.01em;color:var(--ink-2)}
-  .mon p{font-size:13px;color:var(--mid);margin:0;line-height:1.6;max-width:42ch}
-  .mon-foot{display:flex;gap:18px;margin-top:20px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
-  .mon-foot span{display:flex;align-items:center;gap:6px}
-  .mon-foot .d{width:4px;height:4px;border-radius:50%;background:var(--amber)}
+/* Out arrow */
+.out-arr{width:48px;display:flex;align-items:center;position:relative}
+.out-arr::before{content:"";position:absolute;height:1px;left:0;right:16px;background:var(--amber);opacity:.65}
+.out-arr::after{content:"";position:absolute;right:0;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:8px solid var(--amber)}
 
-  /* Diagram-style svg in mon */
-  .mon-diagram{position:absolute;bottom:0;right:0;width:50%;height:60%;opacity:.18;pointer-events:none}
+/* State panel */
+.state-panel{border:1px solid var(--line);background:var(--bg-1);padding:20px;display:flex;flex-direction:column;gap:14px}
+.sp-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.sp-current{display:flex;align-items:center;gap:10px}
+.sp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;transition:background .4s,box-shadow .4s}
+.sp-dot.nominal{background:var(--green);box-shadow:0 0 10px rgba(61,202,116,.6)}
+.sp-dot.warn{background:var(--yellow);box-shadow:0 0 10px rgba(212,168,32,.6)}
+.sp-dot.fault{background:var(--red);box-shadow:0 0 10px rgba(240,80,80,.6)}
+.sp-label{font-family:var(--display);font-size:22px;font-weight:600;letter-spacing:-.025em;color:var(--ink-2);transition:color .3s}
+.sp-since{font-size:10px;color:var(--dim);letter-spacing:.08em}
+.sp-hist{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:14px}
+.sp-row{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--dim)}
+.shd{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:background .3s}
+.shd.nominal{background:var(--green);opacity:.5}
+.shd.warn{background:var(--yellow);opacity:.7}
+.shd.fault{background:var(--red);opacity:.7}
 
-  /* Sensor types */
-  .sensors{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line)}
-  .sensor{padding:32px;border-right:1px solid var(--line);position:relative;min-height:320px;background:var(--bg-1);display:flex;flex-direction:column}
-  .sensor:last-child{border-right:none}
-  .sensor-glyph{height:120px;margin-bottom:22px;display:flex;align-items:center;justify-content:center;border:1px dashed var(--line-2);background:linear-gradient(180deg, rgba(202,74,14,.02), transparent)}
-  .sensor-kicker{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
-  .sensor h3{font-family:var(--display);font-size:24px;font-weight:500;letter-spacing:-.02em;margin:0 0 10px;color:var(--ink-2)}
-  .sensor p{font-size:13px;color:var(--mid);margin:0 0 18px;line-height:1.6}
-  .sensor-specs{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-top:18px;border-top:1px solid var(--line);font-size:11px}
-  .sensor-specs .k{color:var(--dim);text-transform:uppercase;letter-spacing:.1em;font-size:10px;margin-bottom:2px}
-  .sensor-specs .v{color:var(--ink)}
+/* Corner marks */
+.cx{position:absolute;width:12px;height:12px;border-color:rgba(201,74,12,.45);border-style:solid;pointer-events:none}
+.cx.tl{top:-1px;left:-1px;border-width:1px 0 0 1px}
+.cx.tr{top:-1px;right:-1px;border-width:1px 1px 0 0}
+.cx.bl{bottom:-1px;left:-1px;border-width:0 0 1px 1px}
+.cx.br{bottom:-1px;right:-1px;border-width:0 1px 1px 0}
 
-  /* How it works mini */
-  .how-note{border-left:2px solid var(--amber);padding:20px 24px;background:var(--bg-1);margin-top:32px;font-size:14px;color:var(--mid);max-width:80ch}
-  .how-note strong{color:var(--ink);font-weight:500}
+/* STAT STRIP */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-top:none;background:var(--bg-1)}
+.stat{padding:20px 24px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:none}
+.stat-k{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.stat-v{font-family:var(--display);font-size:26px;font-weight:600;color:var(--ink-2);letter-spacing:-.02em}
+.stat-v .u{color:var(--dim);font-size:13px;margin-left:3px;font-weight:400}
 
-  /* FAQ */
-  .faq{border-top:1px solid var(--line)}
-  .q{border-bottom:1px solid var(--line);padding:24px 0;cursor:pointer;display:grid;grid-template-columns:48px 1fr 48px;gap:20px;align-items:start;transition:background .15s}
-  .q:hover{background:rgba(202,74,14,.02)}
-  .q-num{font-size:11px;color:var(--dim);padding-top:4px;letter-spacing:.1em}
-  .q-title{font-family:var(--display);font-size:20px;font-weight:500;color:var(--ink-2);letter-spacing:-.01em;margin:0}
-  .q-toggle{font-family:var(--mono);color:var(--amber);font-size:18px;text-align:right;transition:transform .2s}
-  .q.open .q-toggle{transform:rotate(45deg)}
-  .q-body{grid-column:2 / 3;max-height:0;overflow:hidden;transition:max-height .3s ease, margin .3s ease, opacity .3s ease;opacity:0;color:var(--mid);font-size:13px;line-height:1.7;max-width:68ch}
-  .q.open .q-body{max-height:400px;margin-top:14px;opacity:1}
+/* SECTIONS */
+.section{padding:100px 0;position:relative}
+.sec-head{display:grid;grid-template-columns:180px 1fr;gap:32px;margin-bottom:60px;align-items:baseline}
+.sec-idx{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);padding-top:6px}
+.sec-title{font-family:var(--display);font-size:clamp(30px,4vw,54px);font-weight:500;letter-spacing:-.03em;color:var(--ink-2);margin:0;line-height:1.08}
+.sec-lead{font-size:14px;color:var(--mid);max-width:58ch;margin-top:18px;line-height:1.75}
+.section-rule{display:flex;align-items:center;gap:16px;font-size:10px;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;padding:0 0 8px}
+.section-rule::before,.section-rule::after{content:"";flex:1;height:1px;background:var(--line)}
 
-  /* Form */
-  .form-wrap{border:1px solid var(--line);background:linear-gradient(180deg, var(--bg-1), var(--bg));padding:48px;display:grid;grid-template-columns:340px 1fr;gap:64px}
-  .form-intro h2{font-family:var(--display);font-size:36px;font-weight:500;letter-spacing:-.025em;margin:0 0 16px;color:var(--ink-2);line-height:1.1}
-  .form-intro p{color:var(--mid);font-size:13px;line-height:1.65;margin:0 0 20px}
-  .form-intro .contact{font-size:12px;color:var(--dim);border-top:1px dashed var(--line-2);padding-top:18px;margin-top:24px}
-  .form-intro .contact a{color:var(--amber)}
-  form{display:grid;grid-template-columns:1fr 1fr;gap:22px 24px}
-  .field{display:flex;flex-direction:column;gap:6px}
-  .field.full{grid-column:1 / -1}
-  .field label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between}
-  .field label .req{color:var(--amber)}
-  .field input, .field select, .field textarea{
-    font-family:var(--mono);
-    font-size:13px;
-    background:transparent;
-    border:none;
-    border-bottom:1px solid var(--line-2);
-    color:var(--ink);
-    padding:10px 0;
-    outline:none;
-    transition:border-color .15s;
-    border-radius:0;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus{border-bottom-color:var(--amber)}
-  .field textarea{min-height:100px;resize:vertical;border:1px solid var(--line-2);padding:12px}
-  .field textarea:focus{border-color:var(--amber)}
-  .field select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%, var(--mid) 50%),linear-gradient(135deg, var(--mid) 50%, transparent 50%);background-position:calc(100% - 14px) 18px, calc(100% - 9px) 18px;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px}
-  .field select option{background:var(--bg-1);color:var(--ink)}
-  .form-foot{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:20px;border-top:1px dashed var(--line-2);gap:20px;flex-wrap:wrap}
-  .form-foot .hint{font-size:11px;color:var(--dim)}
-  .submit{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;background:var(--amber);color:#0A0C0D;font-family:var(--mono);font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s}
-  .submit:hover{background:#E35D1F;box-shadow:0 0 0 4px rgba(202,74,14,.15)}
-  .submit:disabled{opacity:.5;cursor:not-allowed}
-  .form-success{grid-column:1 / -1;padding:24px;border:1px solid var(--green);background:rgba(74,222,128,.04);color:var(--ink);font-size:13px;display:none}
-  .form-success.show{display:block}
+/* HOW IT WORKS */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line)}
+.how-step{padding:36px;border-right:1px solid var(--line);position:relative}
+.how-step:last-child{border-right:none}
+.how-num{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.how-num::after{content:"";flex:1;height:1px;background:var(--line)}
+.how-step h3{font-family:var(--display);font-size:22px;font-weight:500;letter-spacing:-.02em;margin:0 0 12px;color:var(--ink-2)}
+.how-step p{font-size:13px;color:var(--mid);line-height:1.72;margin:0}
+.how-step p strong{color:var(--ink);font-weight:500}
+.how-step:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--amber);z-index:2;background:var(--bg);padding:4px 0;line-height:1}
 
-  /* Footer */
-  footer{border-top:1px solid var(--line);padding:40px 0 32px;color:var(--dim);font-size:11px;letter-spacing:.08em}
-  .foot-grid{display:grid;grid-template-columns:1fr auto auto auto;gap:32px;align-items:baseline}
-  .foot-grid .loc{display:flex;gap:18px;color:var(--mid)}
+/* INPUTS */
+.inputs-grid{display:grid;grid-template-columns:repeat(12,1fr);border:1px solid var(--line)}
+.input-card{padding:28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-1);transition:background .2s;position:relative;overflow:hidden}
+.input-card:hover{background:var(--bg-2)}
+.input-card.w6{grid-column:span 6}
+.input-card.w4{grid-column:span 4}
+.input-card.w12{grid-column:span 12;border-bottom:none}
+.input-card.no-right{border-right:none}
+.input-card::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .25s;background:radial-gradient(350px 200px at var(--mx,50%) var(--my,30%),rgba(201,74,12,.08),transparent 65%);pointer-events:none}
+.input-card:hover::before{opacity:1}
+.ic-tag{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:14px}
+.input-card h3{font-family:var(--display);font-size:21px;font-weight:500;letter-spacing:-.02em;margin:0 0 10px;color:var(--ink-2);transition:color .2s}
+.input-card:hover h3{color:var(--amber)}
+.input-card p{font-size:13px;color:var(--mid);line-height:1.65;margin:0;max-width:44ch}
+.ic-foot{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.ic-foot span{display:flex;align-items:center;gap:5px}
+.ic-dot{width:3px;height:3px;border-radius:50%;background:var(--amber)}
+.ic-diagram{position:absolute;bottom:0;right:0;width:46%;height:65%;opacity:.12;pointer-events:none}
 
-  /* Responsive */
-  @media (max-width: 900px){
-    .wrap{padding:0 20px}
-    .nav-links{display:none}
-    .scope-body{grid-template-columns:1fr}
-    .scope-canvas{border-right:none;border-bottom:1px solid var(--line)}
-    .stats{grid-template-columns:1fr 1fr}
-    .stat{border-right:none;border-bottom:1px solid var(--line)}
-    .sec-head{grid-template-columns:1fr;gap:8px}
-    .mon-grid{grid-template-columns:1fr}
-    .mon{grid-column:span 12 !important;border-right:none !important}
-    .sensors{grid-template-columns:1fr}
-    .sensor{border-right:none;border-bottom:1px solid var(--line)}
-    .form-wrap{grid-template-columns:1fr;padding:28px;gap:32px}
-    form{grid-template-columns:1fr}
-    .foot-grid{grid-template-columns:1fr;gap:12px}
-  }
+/* OUTPUTS */
+.out-cards{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line)}
+.out-card{padding:32px;border-right:1px solid var(--line);background:var(--bg-1)}
+.out-card:last-child{border-right:none}
+.out-card-icon{font-size:20px;margin-bottom:18px;display:block;color:var(--amber)}
+.out-card h3{font-family:var(--display);font-size:20px;font-weight:500;letter-spacing:-.02em;margin:0 0 10px;color:var(--ink-2)}
+.out-card p{font-size:13px;color:var(--mid);line-height:1.72;margin:0}
+.out-card p strong{color:var(--ink);font-weight:500}
 
-  /* Small tech details */
-  .crosshair{position:absolute;width:12px;height:12px;border:1px solid var(--amber);opacity:.6}
-  .crosshair.tl{top:-1px;left:-1px;border-right:none;border-bottom:none}
-  .crosshair.tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
-  .crosshair.bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
-  .crosshair.br{bottom:-1px;right:-1px;border-left:none;border-top:none}
+/* NOTE */
+.note{border-left:2px solid var(--amber);padding:20px 24px;background:var(--bg-1);font-size:14px;color:var(--mid);max-width:84ch;margin-top:32px;line-height:1.72}
+.note strong{color:var(--ink);font-weight:500}
 
-  .section-divider{display:flex;align-items:center;gap:16px;font-size:10px;color:var(--dim);letter-spacing:.2em;text-transform:uppercase;padding:0 0 8px}
-  .section-divider::before, .section-divider::after{content:"";flex:1;height:1px;background:var(--line)}
+/* FORM */
+.form-wrap{border:1px solid var(--line);background:radial-gradient(800px 300px at 20% 0%,rgba(201,74,12,.05),transparent 60%),linear-gradient(180deg,var(--bg-1),var(--bg));padding:52px;display:grid;grid-template-columns:360px 1fr;gap:72px;position:relative;box-shadow:0 30px 80px -40px rgba(0,0,0,.9),inset 0 0 0 1px rgba(201,74,12,.04)}
+.form-intro h2{font-family:var(--display);font-size:clamp(28px,3.4vw,44px);font-weight:500;letter-spacing:-.03em;margin:0 0 18px;color:var(--ink-2);line-height:1.1}
+.form-intro p{color:var(--mid);font-size:13px;line-height:1.72;margin:0 0 20px}
+.form-contact{font-size:12px;color:var(--dim);border-top:1px dashed var(--line-2);padding-top:18px;margin-top:24px}
+.form-contact a{color:var(--amber)}
+form{display:grid;grid-template-columns:1fr 1fr;gap:24px 28px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field.honeypot{position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden}
+.field label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between}
+.req{color:var(--amber)}
+.field input,.field select,.field textarea{font-family:var(--mono);font-size:13px;background:transparent;border:none;border-bottom:1px solid var(--line-2);color:var(--ink);padding:10px 0;outline:none;transition:border-color .15s;-webkit-appearance:none;appearance:none;border-radius:0}
+.field input:focus,.field select:focus,.field textarea:focus{border-bottom-color:var(--amber)}
+.field textarea{min-height:110px;resize:vertical;border:1px solid var(--line-2);padding:12px}
+.field textarea:focus{border-color:var(--amber)}
+.field select{background-image:linear-gradient(45deg,transparent 50%,var(--mid) 50%),linear-gradient(135deg,var(--mid) 50%,transparent 50%);background-position:calc(100% - 14px) 18px,calc(100% - 9px) 18px;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px}
+.field select option{background:var(--bg-1);color:var(--ink)}
+.form-foot{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:20px;border-top:1px dashed var(--line-2);gap:20px;flex-wrap:wrap}
+.form-hint{font-size:11px;color:var(--dim)}
+.submit{display:inline-flex;align-items:center;gap:10px;padding:15px 28px;background:var(--amber);color:#080A0B;font-family:var(--mono);font-size:13px;font-weight:700;border:none;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;letter-spacing:.03em;touch-action:manipulation;border-radius:2px}
+.submit::after{content:"";position:absolute;inset:0;background:linear-gradient(108deg,transparent 40%,rgba(255,255,255,.22) 50%,transparent 60%);transform:translateX(-100%);transition:transform .55s}
+.submit:hover{background:var(--amber-hi);box-shadow:0 0 0 4px rgba(201,74,12,.15)}
+.submit:hover::after{transform:translateX(100%)}
+.submit:disabled{opacity:.5;cursor:not-allowed}
+.form-success{grid-column:1/-1;padding:24px;border:1px solid var(--green);background:rgba(61,202,116,.04);color:var(--ink);font-size:13px;display:none}
+.form-success.show{display:block}
 
-  /* ========== LUXE LAYER ========== */
+/* FOOTER */
+footer{border-top:1px solid var(--line);padding:36px 0 28px;color:var(--dim);font-size:11px;letter-spacing:.07em}
+.foot-row{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:16px}
+.foot-right{display:flex;gap:24px;align-items:baseline}
 
-  /* Film grain over the whole page */
-  body::after{
-    content:"";position:fixed;inset:0;pointer-events:none;z-index:100;opacity:.035;mix-blend-mode:overlay;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='1'/></svg>");
-  }
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
-  /* Nav: subtle animated hairline underlining the bar */
-  .nav{position:sticky;top:0;z-index:50}
-  .nav::after{
-    content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;
-    background:linear-gradient(90deg, transparent, var(--amber) 20%, var(--amber) 80%, transparent);
-    opacity:.4;
-  }
-
-  /* Kicker pulse */
-  .kicker-pulse{
-    width:8px;height:8px;border-radius:50%;background:var(--amber);
-    box-shadow:0 0 0 0 rgba(202,74,14,.65);
-    animation:pulseRing 2.4s ease-out infinite;
-    display:inline-block;
-  }
-  @keyframes pulseRing{
-    0%{box-shadow:0 0 0 0 rgba(202,74,14,.6)}
-    70%{box-shadow:0 0 0 10px rgba(202,74,14,0)}
-    100%{box-shadow:0 0 0 0 rgba(202,74,14,0)}
-  }
-
-  /* Headline: bigger, more editorial + shimmer on the accent word */
-  h1.headline{
-    font-size:clamp(46px, 7.8vw, 108px);
-    letter-spacing:-.04em;
-    font-weight:500;
-  }
-  .amber-fx{
-    background: linear-gradient(110deg,
-      var(--amber) 0%, var(--amber) 40%,
-      #F27B3C 50%,
-      var(--amber) 60%, var(--amber) 100%);
-    background-size:200% 100%;
-    -webkit-background-clip:text;background-clip:text;
-    color:transparent;
-    animation:shine 6s linear infinite;
-    position:relative;
-  }
-  @keyframes shine{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-  /* Hero: extra luxe backdrop — radial glow orbiting behind */
-  .hero::after{
-    content:"";position:absolute;pointer-events:none;z-index:1;
-    width:640px;height:640px;border-radius:50%;
-    background:radial-gradient(circle, rgba(202,74,14,.10), transparent 60%);
-    top:-120px;right:-140px;
-    filter:blur(20px);
-    animation:drift 18s ease-in-out infinite alternate;
-  }
-  @keyframes drift{
-    0%{transform:translate(0,0)}
-    100%{transform:translate(-40px,20px)}
-  }
-
-  /* Sub copy: richer */
-  .sub{font-size:17px;line-height:1.7;max-width:58ch}
-  .sub strong{color:var(--amber);font-weight:500}
-
-  /* Button: inner glow on primary + chevron */
-  .btn{transition:all .25s cubic-bezier(.2,.8,.2,1);border-radius:2px}
-  .btn.primary{
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 0 0 0 rgba(202,74,14,.35);
-    padding:14px 22px;font-size:13px;
-  }
-  .btn.primary:hover{
-    transform:translateY(-1px);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 10px 30px -8px rgba(202,74,14,.55), 0 0 0 4px rgba(202,74,14,.12);
-  }
-  .btn:not(.primary){padding:14px 22px}
-
-  /* Scope: richer frame — corner ticks, scan line, glowing ruler */
-  .scope{
-    background:
-      radial-gradient(ellipse at 70% 10%, rgba(202,74,14,.06), transparent 50%),
-      linear-gradient(180deg, rgba(20,24,27,.85), rgba(10,12,13,.85));
-    box-shadow:
-      inset 0 0 0 1px rgba(202,74,14,.08),
-      0 30px 60px -30px rgba(0,0,0,.9);
-  }
-  .scope::before{
-    content:"";position:absolute;left:0;right:0;top:0;height:2px;pointer-events:none;
-    background:linear-gradient(90deg, transparent, var(--amber), transparent);
-    opacity:.55;
-    animation:scan 5s linear infinite;
-  }
-  @keyframes scan{
-    0%{transform:translateY(0);opacity:0}
-    20%{opacity:.55}
-    80%{opacity:.55}
-    100%{transform:translateY(260px);opacity:0}
-  }
-  .crosshair{width:14px;height:14px;border-width:1.5px}
-
-  /* Section titles: editorial scale-up */
-  .sec-title{font-size:clamp(32px,4.2vw,56px);letter-spacing:-.03em}
-  .sec-lead{font-size:15px}
-
-  /* Monitor cards: lift + accent glow on hover */
-  .mon{transition:all .3s cubic-bezier(.2,.8,.2,1);overflow:hidden}
-  .mon::before{
-    content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
-    background:radial-gradient(400px 200px at var(--mx,50%) var(--my,30%), rgba(202,74,14,.10), transparent 60%);
-  }
-  .mon:hover::before{opacity:1}
-  .mon:hover h3{color:var(--amber)}
-  .mon h3{transition:color .2s}
-
-  /* Sensor cards: refine */
-  .sensor{transition:background .3s}
-  .sensor:hover{background:var(--bg-2)}
-  .sensor-glyph{background:
-    radial-gradient(ellipse at 50% 50%, rgba(202,74,14,.04), transparent 70%),
-    linear-gradient(180deg, rgba(202,74,14,.02), transparent);
-  }
-
-  /* Form: richer chrome */
-  .form-wrap{
-    background:
-      radial-gradient(800px 300px at 20% 0%, rgba(202,74,14,.05), transparent 60%),
-      linear-gradient(180deg, var(--bg-1), var(--bg));
-    box-shadow: 0 30px 80px -40px rgba(0,0,0,.9), inset 0 0 0 1px rgba(202,74,14,.04);
-  }
-  .form-intro h2{font-size:clamp(32px,3.6vw,48px)}
-  .submit{position:relative;overflow:hidden;padding:16px 28px;letter-spacing:.02em}
-  .submit::after{
-    content:"";position:absolute;inset:0;
-    background:linear-gradient(110deg, transparent 40%, rgba(255,255,255,.25) 50%, transparent 60%);
-    transform:translateX(-100%);transition:transform .6s;
-  }
-  .submit:hover::after{transform:translateX(100%)}
-
-  /* Nav link hover underline */
-  .nav-links a{position:relative;padding:4px 0}
-  .nav-links a::after{
-    content:"";position:absolute;left:0;right:100%;bottom:-2px;height:1px;background:var(--amber);transition:right .25s;
-  }
-  .nav-links a:hover::after{right:0}
-
-  /* MOBILE FIXES for the scope */
-  @media (max-width: 900px){
-    .hero{padding:40px 0 24px}
-    .hero::before{background-size:32px 32px}
-    h1.headline{font-size:clamp(40px,9vw,64px);letter-spacing:-.035em}
-    .sub{font-size:15px}
-    .scope{margin-top:36px}
-    .scope-head{flex-wrap:wrap}
-    .scope-head > div{border-right:none;border-bottom:1px solid var(--line);flex:1 1 50%;padding:8px 12px;font-size:10px}
-    .scope-head > div:last-child{margin-left:0;border-bottom:none}
-    .scope-body{grid-template-columns:1fr;min-height:0}
-    .scope-canvas{border-right:none;border-bottom:1px solid var(--line);height:200px;min-height:200px}
-    .scope-canvas canvas{width:100%;height:200px;display:block}
-    .scope-side{padding:16px}
-    .illus-note p{font-size:12px}
-    .scope-ticks{font-size:8px}
-    .scope-anomaly{font-size:9px;top:8px}
-    .crosshair{width:10px;height:10px}
-    .hero-cta{gap:10px}
-    .btn{padding:12px 18px;font-size:12px}
-    .sec-title{font-size:clamp(28px,6vw,40px)}
-    .form-wrap{padding:24px 18px}
-    .form-intro h2{font-size:28px}
-  }
-  @media (max-width: 480px){
-    .wrap{padding:0 16px}
-    .hero{padding:28px 0 16px}
-    h1.headline{font-size:44px}
-    .nav-cta{display:none}
-    .scope-head > div{flex:1 1 100%}
-  }
+@media(max-width:1020px){
+  .wrap{padding:0 24px}
+  .dw-body{grid-template-columns:1fr!important;padding:24px;gap:20px;display:flex;flex-direction:column;align-items:center}
+  .feeds,.unit-spine,.out-arr{display:none}
+  .state-panel{width:100%;max-width:360px}
+  .how-grid{grid-template-columns:1fr}
+  .how-step{border-right:none;border-bottom:1px solid var(--line)}
+  .how-step:last-child{border-bottom:none}
+  .how-step::after{display:none}
+  .inputs-grid{grid-template-columns:1fr}
+  .input-card{grid-column:span 12!important;border-right:none!important}
+  .out-cards{grid-template-columns:1fr}
+  .out-card{border-right:none;border-bottom:1px solid var(--line)}
+  .out-card:last-child{border-bottom:none}
+  .sec-head{grid-template-columns:1fr;gap:8px}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(odd){border-right:1px solid var(--line)}
+  .stat:nth-child(even){border-right:none}
+  .stat{border-bottom:1px solid var(--line)}
+  .stat:nth-child(3),.stat:nth-child(4){border-bottom:none}
+  .form-wrap{grid-template-columns:1fr;padding:28px 20px;gap:36px}
+  form{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+@media(max-width:600px){
+  .wrap{padding:0 18px}
+  .hero{padding:40px 0 0}
+  h1.headline{font-size:clamp(44px,10vw,68px)}
+  .hero-cta{gap:10px}
+  .btn{padding:12px 16px;font-size:11px}
+  .stats{grid-template-columns:1fr}
+  .stat,.stat:nth-child(odd),.stat:nth-child(even){border-right:none;border-bottom:1px solid var(--line)}
+  .stat:last-child{border-bottom:none}
+  .nav-cta{display:none}
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="nav">
+<nav class="nav" role="navigation" aria-label="Main navigation">
   <div class="wrap nav-inner">
-    <div class="brand">
-      <div class="logo"><span class="brand-dot" style="position:absolute;top:8px;left:8px"></span></div>
+    <a href="/" class="brand" aria-label="osrep.ai home">
+      <span class="brand-pulse" aria-hidden="true"></span>
       <span class="brand-name">osrep<em>.</em>ai</span>
-    </div>
+    </a>
     <div class="nav-links">
-      <a href="#monitor">Monitor</a>
-      <a href="#sensors">Sensors</a>
+      <a href="#how">How it works</a>
+      <a href="#inputs">What we ingest</a>
       <a href="#contact">Contact</a>
     </div>
     <a href="#contact" class="nav-cta">Get in touch →</a>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
+<section class="hero" aria-labelledby="hero-headline">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="hero-orb" aria-hidden="true"></div>
   <div class="wrap hero-inner">
-    <div class="kicker"><span class="kicker-pulse"></span>[<em>sys.status</em>] sensors — online</div>
-    <h1 class="headline">
-      Predictive<br>
-      maintenance<br>
-      <span class="amber amber-fx">at the edge.</span>
-    </h1>
-    <p class="sub">
-      Next-gen AI sensors with <strong>extreme efficiency</strong> and <strong>ultra-low latency</strong>. Each sensor trains on-chip to the exact pump, wellhead, turbine, or pipeline it's bolted to — running constant state monitoring at an energy and compute budget traditional edge sensors can't match.
-    </p>
-    <div class="hero-cta">
-      <a href="#contact" class="btn primary">Get in touch <span class="arrow">→</span></a>
-      <a href="#monitor" class="btn">See what we monitor</a>
+
+    <div class="kicker" aria-hidden="true">
+      <span class="kicker-dot"></span>
+      [<em>unit.status</em>] edge processors — deployed
     </div>
 
-    <!-- ILLUSTRATIVE WAVEFORM SCOPE -->
-    <div class="scope" id="scope">
-      <span class="crosshair tl"></span><span class="crosshair tr"></span>
-      <span class="crosshair bl"></span><span class="crosshair br"></span>
-      <div class="scope-head">
-        <div><span class="label">view</span> <span class="val">illustrative · not real data</span></div>
-        <div><span class="label">signal</span> <span class="val amber">synthetic waveform</span></div>
-        <div><span class="label">state</span> <span class="val amber" id="scope-state">monitoring</span></div>
+    <h1 class="headline" id="hero-headline">
+      Every<br>sensor.<br>
+      <span class="hl-accent">One state.</span>
+    </h1>
+
+    <p class="sub">
+      We deploy <strong>hardened edge processing units</strong> at your assets.
+      Each unit ingests every sensor already wired to that point,
+      runs all inference <em>on the unit</em>, and returns a single
+      continuous machine state. <strong>No raw data leaves the asset.</strong>
+    </p>
+
+    <div class="hero-cta">
+      <a href="#contact" class="btn primary">Get in touch <span class="arr" aria-hidden="true">→</span></a>
+      <a href="#how" class="btn">See how it works</a>
+    </div>
+
+    <!-- STATE TOPOLOGY DIAGRAM -->
+    <div class="diagram-wrap" role="img" aria-label="Diagram showing multiple sensor inputs flowing into an OSREP edge processing unit, which outputs a single machine state">
+      <span class="cx tl" aria-hidden="true"></span><span class="cx tr" aria-hidden="true"></span>
+      <span class="cx bl" aria-hidden="true"></span><span class="cx br" aria-hidden="true"></span>
+
+      <div class="dw-head" aria-hidden="true">
+        <div class="dw-hc"><span class="dw-lbl">view</span><span class="dw-val">edge unit topology — illustrative</span></div>
+        <div class="dw-hc"><span class="dw-lbl">unit</span><span class="dw-val amber">OSREP-1 · asset 04</span></div>
+        <div class="dw-hc"><span class="dw-lbl">output state</span><span class="dw-val green" id="hdr-state">nominal</span></div>
       </div>
-      <div class="scope-body">
-        <div class="scope-canvas">
-          <canvas id="wave"></canvas>
-          <div class="scope-ticks"><span>t₀</span><span></span><span></span><span></span><span>now</span></div>
-          <div class="scope-anomaly" id="anomaly">▲ anomaly detected</div>
+
+      <div class="dw-body" aria-hidden="true">
+        <div class="feeds">
+          <div class="feed"><div class="feed-icon">USN</div><div class="feed-meta"><span class="feed-name">Ultrasound</span><span class="feed-type">acoustic</span></div><div class="feed-line"><span class="flow"></span></div></div>
+          <div class="feed"><div class="feed-icon">ACC</div><div class="feed-meta"><span class="feed-name">Accelerometer</span><span class="feed-type">vibration</span></div><div class="feed-line"><span class="flow"></span></div></div>
+          <div class="feed"><div class="feed-icon">TMP</div><div class="feed-meta"><span class="feed-name">Temperature</span><span class="feed-type">thermal</span></div><div class="feed-line"><span class="flow"></span></div></div>
+          <div class="feed"><div class="feed-icon">PSI</div><div class="feed-meta"><span class="feed-name">Pressure</span><span class="feed-type">process</span></div><div class="feed-line"><span class="flow"></span></div></div>
+          <div class="feed"><div class="feed-icon">AMP</div><div class="feed-meta"><span class="feed-name">Current draw</span><span class="feed-type">electrical</span></div><div class="feed-line"><span class="flow"></span></div></div>
         </div>
-        <div class="scope-side">
-          <div class="illus-note">
-            <div class="illus-title">// illustrative</div>
-            <p>This panel shows what a sensor feed <em>might</em> look like — a baseline trace with occasional anomalies flagged in real time. The actual signal, scale, and metrics depend on the equipment and sensor class deployed.</p>
+        <div class="unit-spine"></div>
+        <div class="unit-box">
+          <span class="unit-lbl">edge unit</span>
+          <span class="unit-name">OSREP</span>
+          <span class="unit-sub">on-unit inference<br>no cloud dependency</span>
+          <span class="unit-active"></span>
+        </div>
+        <div class="out-arr"></div>
+        <div class="state-panel">
+          <div class="sp-title">// current state</div>
+          <div class="sp-current">
+            <span class="sp-dot nominal" id="sp-dot"></span>
+            <span class="sp-label" id="sp-label">Nominal</span>
+          </div>
+          <div class="sp-since" id="sp-since">stable · 14d 06h 32m</div>
+          <div class="sp-hist">
+            <div class="sp-row"><span class="shd warn" id="sh0"></span><span id="sh0t"> 14d ago — transient warn (resolved)</span></div>
+            <div class="sp-row"><span class="shd nominal" id="sh1"></span><span id="sh1t"> 28d ago — nominal</span></div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- WHAT WE MONITOR -->
-<section class="section" id="monitor">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="sec-index"><span>what we monitor</span></div>
-      <div>
-        <h2 class="sec-title">Anything with a<br>failure mode and a signal.</h2>
-        <p class="sec-lead">We started in heavy industry — pumps, wellheads, wind. The machines are different; the job isn't. Pick a device, bond a sensor, let it learn its own baseline on-chip. It tells you when something changes.</p>
-      </div>
-    </div>
-
-    <div class="mon-grid">
-      <div class="mon w-6">
-        <div class="mon-tag"><span>liquid flow</span></div>
-        <div>
-          <h3>Pipelines & process loops</h3>
-          <p>Turbulence, cavitation, valve chatter, slug flow, blockage buildup. Ultrasound captures the acoustic signature of flow; on-chip models learn your loop's normal and flag drift in real time.</p>
-        </div>
-        <div class="mon-foot">
-          <span><span class="d"></span>ultrasound</span>
-          <span><span class="d"></span>pressure</span>
-          <span><span class="d"></span>flow rate</span>
-        </div>
-        <svg class="mon-diagram" viewBox="0 0 200 120" fill="none" stroke="#CA4A0E" stroke-width="1">
-          <path d="M0 60 Q 40 20 80 60 T 160 60 T 240 60" stroke-dasharray="2 3"/>
-          <circle cx="80" cy="60" r="4"/>
-          <circle cx="160" cy="60" r="4"/>
-          <line x1="0" y1="90" x2="200" y2="90"/>
-          <line x1="0" y1="30" x2="200" y2="30"/>
-        </svg>
-      </div>
-
-      <div class="mon w-6" style="border-right:none">
-        <div class="mon-tag"><span>wellheads & pumps</span></div>
-        <div>
-          <h3>Rotating equipment</h3>
-          <p>Bearing wear, imbalance, misalignment, seal degradation, rod pump gas-lock. Accelerometer + ultrasound gives both the mechanical and acoustic view — each unit's model knows its own harmonic fingerprint.</p>
-        </div>
-        <div class="mon-foot">
-          <span><span class="d"></span>accelerometer</span>
-          <span><span class="d"></span>ultrasound</span>
-          <span><span class="d"></span>current</span>
-        </div>
-        <svg class="mon-diagram" viewBox="0 0 200 120" fill="none" stroke="#CA4A0E" stroke-width="1">
-          <circle cx="100" cy="60" r="40"/>
-          <circle cx="100" cy="60" r="26"/>
-          <circle cx="100" cy="60" r="3" fill="#CA4A0E"/>
-          <line x1="60" y1="60" x2="140" y2="60"/>
-          <line x1="100" y1="20" x2="100" y2="100"/>
-        </svg>
-      </div>
-
-      <div class="mon w-4">
-        <div class="mon-tag"><span>wind farms</span></div>
-        <div>
-          <h3>Turbines & gearboxes</h3>
-          <p>Blade-pass anomalies, gearbox tooth defects, yaw misalignment. Low-power means you can actually keep sensors on every hub without running new cable.</p>
-        </div>
-        <div class="mon-foot">
-          <span><span class="d"></span>vibration</span>
-          <span><span class="d"></span>strain</span>
-        </div>
-      </div>
-
-      <div class="mon w-4">
-        <div class="mon-tag"><span>infrastructure</span></div>
-        <div>
-          <h3>Civil & structural</h3>
-          <p>Bridges, compressor stations, tanks, water networks. Any structure with a resonant signature. Long-baseline monitoring without sending raw telemetry upstream.</p>
-        </div>
-        <div class="mon-foot">
-          <span><span class="d"></span>accelerometer</span>
-          <span><span class="d"></span>acoustic</span>
-        </div>
-      </div>
-
-      <div class="mon w-4" style="border-right:none">
-        <div class="mon-tag"><span>anything else</span></div>
-        <div>
-          <h3>Bring your own telemetry</h3>
-          <p>Temperature, current, strain, pressure, optical, magnetic — if the signal has a stationary baseline, our architecture learns it on-chip. We work with you on integration.</p>
-        </div>
-        <div class="mon-foot">
-          <span><span class="d"></span>any sensor</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="how-note">
-      <strong>How the on-chip part works →</strong> each sensor boots, observes its host for a short commissioning window, and locks a model to that specific unit. No cloud training loop, no per-device tuning in the field. Identical hardware produces a different model on every machine. That's what makes it adaptive.
+    <div class="stats" aria-label="Key product specifications">
+      <div class="stat"><div class="stat-k">Sensor inputs</div><div class="stat-v">Any<span class="u">type</span></div></div>
+      <div class="stat"><div class="stat-k">State outputs</div><div class="stat-v">1<span class="u">per unit</span></div></div>
+      <div class="stat"><div class="stat-k">Cloud dependency</div><div class="stat-v">0<span class="u">required</span></div></div>
+      <div class="stat"><div class="stat-k">Raw data egress</div><div class="stat-v">None</div></div>
     </div>
   </div>
 </section>
 
-<!-- SENSOR TYPES -->
-<section class="section" id="sensors" style="padding-top:40px">
+<section class="section" id="how" aria-labelledby="how-title">
   <div class="wrap">
     <div class="sec-head">
-      <div class="sec-index"><span>sensor types</span></div>
+      <div class="sec-idx">how it works</div>
       <div>
-        <h2 class="sec-title">Ultrasound, accelerometry,<br>or any telemetry.</h2>
-        <p class="sec-lead">Our traditional focus has been ultrasound and accelerometer data — but the on-chip architecture is sensor-agnostic. If the signal has a stationary baseline, we can learn it.</p>
+        <h2 class="sec-title" id="how-title">Deploy. Ingest.<br>Return a state.</h2>
+        <p class="sec-lead">Three steps. The intelligence stays at the asset. What comes back upstream is a state, not a firehose.</p>
       </div>
     </div>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">01</div>
+        <h3>Mount the unit</h3>
+        <p>An OSREP edge processing unit mounts at each monitoring point on your equipment. It connects to <strong>whatever sensors are already wired there</strong> — or new ones where needed. No rip-and-replace. The unit handles multi-sensor ingestion natively: acoustic, vibration, thermal, electrical, process.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">02</div>
+        <h3>Learn on-unit</h3>
+        <p>After a short commissioning window, the unit has built a model of <strong>this specific asset at this specific point</strong>. All learning happens on the hardware — no data leaves, no cloud loop, no per-device tuning from your team. Identical units produce different models on different machines.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">03</div>
+        <h3>Emit a state</h3>
+        <p>From that point on, the unit continuously monitors all its sensor inputs and emits a <strong>single state</strong>: nominal, degrading, or fault — with confidence and time-in-state. That state is what travels upstream. Your operators get signal, not noise.</p>
+      </div>
+    </div>
+    <div class="note" role="note">
+      <strong>Why state and not data?</strong> Raw sensor streams are expensive to transmit, store, and interpret at scale. A state is an already-interpreted answer. When it changes, you know something changed — and the unit can tell you which input drove it. You get the intelligence without the data tax.
+    </div>
+  </div>
+</section>
 
-    <div class="sensors">
-      <div class="sensor">
-        <div class="sensor-glyph">
-          <svg width="140" height="80" viewBox="0 0 140 80" fill="none" stroke="#CA4A0E" stroke-width="1.2">
-            <path d="M5 40 Q 15 10 25 40 T 45 40 T 65 40 T 85 40 T 105 40 T 125 40 T 135 40" />
-            <path d="M5 40 Q 12 32 19 40 T 33 40 T 47 40 T 61 40 T 75 40 T 89 40 T 103 40 T 117 40 T 131 40" stroke="#4CC9F0" stroke-dasharray="1 2"/>
-            <circle cx="5" cy="40" r="2" fill="#CA4A0E"/>
-            <circle cx="135" cy="40" r="2" fill="#CA4A0E"/>
-          </svg>
-        </div>
-        <div class="sensor-kicker">// primary · acoustic</div>
+<section class="section" id="inputs" aria-labelledby="inputs-title" style="padding-top:40px">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-idx">what we ingest</div>
+      <div>
+        <h2 class="sec-title" id="inputs-title">If it's wired to<br>the asset, we read it.</h2>
+        <p class="sec-lead">The unit is sensor-agnostic. Our core work is in acoustic and vibration signals — but the on-unit architecture will ingest any signal with a stationary baseline. You bring the sensors already on your equipment; we bring the intelligence layer on top of them.</p>
+      </div>
+    </div>
+    <div class="inputs-grid" role="list">
+      <div class="input-card w6" role="listitem">
+        <div class="ic-tag">acoustic</div>
         <h3>Ultrasound</h3>
-        <p>Acoustic monitoring for failure signatures that present in the ultrasonic range — bearing friction, turbulence, cavitation, electrical arcing.</p>
-      </div>
-
-      <div class="sensor">
-        <div class="sensor-glyph">
-          <svg width="140" height="80" viewBox="0 0 140 80" fill="none" stroke="#CA4A0E" stroke-width="1.2">
-            <line x1="5" y1="40" x2="135" y2="40" stroke="#2A3035"/>
-            <path d="M5 40 L15 40 L18 20 L22 60 L26 30 L30 50 L34 38 L44 42 L52 20 L58 60 L64 38 L74 42 L82 15 L88 65 L94 38 L104 42 L110 30 L116 50 L122 40 L135 40"/>
-            <line x1="5" y1="15" x2="5" y2="65"/>
-            <line x1="135" y1="15" x2="135" y2="65"/>
-          </svg>
+        <p>Failure signatures that appear in the ultrasonic band — bearing friction, cavitation, turbulence, valve chatter, electrical arcing. High-frequency acoustic is often the earliest indicator of mechanical degradation.</p>
+        <div class="ic-foot">
+          <span><span class="ic-dot" aria-hidden="true"></span>contact probe</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>airborne</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>structure-borne</span>
         </div>
-        <div class="sensor-kicker">// primary · mechanical</div>
+        <svg class="ic-diagram" viewBox="0 0 200 120" fill="none" stroke="#C94A0C" stroke-width="1" aria-hidden="true" focusable="false">
+          <path d="M5 60 Q15 20 25 60 T45 60 T65 60 T85 60 T105 60 T125 60 T145 60 T165 60" stroke-dasharray="1 2"/>
+          <path d="M5 60 Q20 10 35 60 T65 60 T95 60 T125 60 T155 60"/>
+          <circle cx="5" cy="60" r="3" fill="#C94A0C"/>
+          <circle cx="165" cy="60" r="3" fill="#C94A0C"/>
+        </svg>
+      </div>
+      <div class="input-card w6 no-right" role="listitem">
+        <div class="ic-tag">vibration</div>
         <h3>Accelerometer</h3>
-        <p>Vibration monitoring for rotating equipment — imbalance, misalignment, looseness, resonance, gear-mesh faults. Each unit's on-chip model learns its own harmonic baseline.</p>
-      </div>
-
-      <div class="sensor">
-        <div class="sensor-glyph">
-          <svg width="140" height="80" viewBox="0 0 140 80" fill="none" stroke="#CA4A0E" stroke-width="1.2">
-            <rect x="10" y="20" width="40" height="40" stroke-dasharray="2 2"/>
-            <rect x="55" y="30" width="30" height="20" stroke-dasharray="2 2"/>
-            <rect x="90" y="15" width="45" height="50" stroke-dasharray="2 2"/>
-            <text x="30" y="45" fill="#6B7280" font-family="JetBrains Mono" font-size="9" text-anchor="middle">temp</text>
-            <text x="70" y="45" fill="#6B7280" font-family="JetBrains Mono" font-size="9" text-anchor="middle">I</text>
-            <text x="112" y="45" fill="#6B7280" font-family="JetBrains Mono" font-size="9" text-anchor="middle">ε,P,B</text>
-          </svg>
+        <p>Mechanical signatures of rotating and reciprocating equipment — imbalance, misalignment, bearing race defects, gear-mesh faults, looseness, resonance. The unit learns the harmonic fingerprint of each specific machine.</p>
+        <div class="ic-foot">
+          <span><span class="ic-dot" aria-hidden="true"></span>radial</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>axial</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>triaxial</span>
         </div>
-        <div class="sensor-kicker">// extensible</div>
-        <h3>Any telemetry</h3>
-        <p>The on-chip training model doesn't care what the waveform is — if it has a stationary baseline, it can learn it. Strain, pressure, current, temperature, optical, magnetic. Bring the transducer; we work with you on the integration.</p>
+        <svg class="ic-diagram" viewBox="0 0 200 120" fill="none" stroke="#C94A0C" stroke-width="1" aria-hidden="true" focusable="false">
+          <line x1="5" y1="60" x2="195" y2="60" stroke="#1A1E22"/>
+          <path d="M5 60 L20 60 L25 28 L32 92 L39 42 L46 78 L53 58 L68 62 L80 20 L94 100 L108 58 L122 62 L136 18 L148 102 L160 58 L175 62 L190 60"/>
+          <line x1="5" y1="16" x2="5" y2="104"/>
+        </svg>
+      </div>
+      <div class="input-card w4" role="listitem">
+        <div class="ic-tag">thermal</div>
+        <h3>Temperature</h3>
+        <p>Bearing hot-spots, motor winding rise, heat exchanger fouling, coolant anomalies. Thermal inputs contextualize acoustic and vibration readings — a bearing fault reads differently at 40°C vs 110°C.</p>
+        <div class="ic-foot">
+          <span><span class="ic-dot" aria-hidden="true"></span>thermocouple</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>RTD</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>IR</span>
+        </div>
+      </div>
+      <div class="input-card w4" role="listitem">
+        <div class="ic-tag">process</div>
+        <h3>Pressure &amp; flow</h3>
+        <p>Line pressure, differential pressure, flow rate. Essential for pump and compressor health — cavitation, blockage, and valve wear all present in process data before they escalate to mechanical failure.</p>
+        <div class="ic-foot">
+          <span><span class="ic-dot" aria-hidden="true"></span>4–20 mA</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>HART</span>
+        </div>
+      </div>
+      <div class="input-card w4 no-right" role="listitem">
+        <div class="ic-tag">electrical</div>
+        <h3>Current &amp; power</h3>
+        <p>Motor current signature analysis, power factor, voltage imbalance. Electrical signals carry the mechanical load signature — rotor bar faults, coupling issues, and bearing wear all leave electrical traces.</p>
+        <div class="ic-foot">
+          <span><span class="ic-dot" aria-hidden="true"></span>CT clamp</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>inline</span>
+        </div>
+      </div>
+      <div class="input-card w12" role="listitem">
+        <div class="ic-tag">anything else</div>
+        <h3>Bring what you have.</h3>
+        <p>Strain, optical, magnetic, proximity, chemical — if the signal has a stationary baseline, the on-unit model can learn it. Most industrial sites already have instrumentation running to PLCs or historians. We connect to what's there, and work with you on integration before deployment.</p>
+        <div class="ic-foot">
+          <span><span class="ic-dot" aria-hidden="true"></span>analog</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>digital</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>Modbus</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>HART</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>OPC-UA</span>
+          <span><span class="ic-dot" aria-hidden="true"></span>custom</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- JOTFORM / CONTACT -->
-<section class="section" id="contact" style="padding-top:40px;padding-bottom:80px">
+<section class="section" aria-labelledby="output-title" style="padding-top:40px;padding-bottom:80px">
   <div class="wrap">
-    <div class="section-divider">/// contact</div>
-    <div class="form-wrap">
-      <span class="crosshair tl"></span><span class="crosshair tr"></span>
-      <span class="crosshair bl"></span><span class="crosshair br"></span>
-
-      <div class="form-intro">
-        <h2>Get in touch.</h2>
-        <p>Tell us what you want to monitor. We'll reply with a short assessment of whether it's a fit and what it could look like on your equipment.</p>
-        <div class="contact">
-          — or drop a line any time.
-        </div>
+    <div class="sec-head">
+      <div class="sec-idx">what we return</div>
+      <div>
+        <h2 class="sec-title" id="output-title">A state, not a stream.</h2>
+        <p class="sec-lead">Raw sensor data stays on the unit. What travels upstream is already interpreted — actionable without any further processing on your side.</p>
       </div>
+    </div>
+    <div class="out-cards">
+      <div class="out-card">
+        <span class="out-card-icon" aria-hidden="true">◉</span>
+        <h3>Continuous machine state</h3>
+        <p>Every unit emits a rolling state: <strong>nominal, degrading, or fault</strong>. State comes with a confidence value and time-in-state. It updates in real time. If it hasn't changed, you don't need to do anything.</p>
+      </div>
+      <div class="out-card">
+        <span class="out-card-icon" aria-hidden="true">⌥</span>
+        <h3>Input attribution</h3>
+        <p>When state changes, the unit tells you which sensor input drove it and by how much. You get the <strong>cause, not just the symptom</strong> — bearing acoustic up 40%, temperature nominal, vibration nominal. That's a bearing starting to go.</p>
+      </div>
+      <div class="out-card">
+        <span class="out-card-icon" aria-hidden="true">⟁</span>
+        <h3>Fleet-level visibility</h3>
+        <p>Deploy units across multiple points on a single asset, or across an entire fleet. Each unit reports its own state. Your operations layer sees a <strong>clean grid of states</strong> — not a wall of waveforms nobody has time to read.</p>
+      </div>
+    </div>
+    <div class="note" role="note">
+      <strong>Where do the states go?</strong> We output over standard industrial protocols — Modbus, OPC-UA, MQTT — so states drop into your existing SCADA, historian, or operations platform without a new integration stack. We can also provide a lightweight web dashboard if you need one.
+    </div>
+  </div>
+</section>
 
-      <form id="contact-form" action="https://formspree.io/f/mgorpzll" method="POST" novalidate>
-        <div class="field">
-          <label for="f-name">Name <span class="req">*</span></label>
-          <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Jane Doe">
+<section class="section" id="contact" aria-labelledby="contact-title" style="padding-top:0;padding-bottom:80px">
+  <div class="wrap">
+    <div class="section-rule" aria-hidden="true">/// contact</div>
+    <div class="form-wrap">
+      <span class="cx tl" aria-hidden="true"></span><span class="cx tr" aria-hidden="true"></span>
+      <span class="cx bl" aria-hidden="true"></span><span class="cx br" aria-hidden="true"></span>
+      <div class="form-intro">
+        <h2 id="contact-title">Tell us what you're monitoring.</h2>
+        <p>We'll come back with a short assessment — whether it's a fit, what a deployment could look like at your site, and which sensors we'd need to work with.</p>
+        <div class="form-contact">— or email us at <a href="mailto:hello@osrep.ai">hello@osrep.ai</a></div>
+      </div>
+      <form id="contact-form" action="https://formspree.io/f/mgorpzll" method="POST" novalidate aria-label="Contact form">
+        <div class="field honeypot" aria-hidden="true">
+          <label for="f-hp">Website</label>
+          <input id="f-hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
         </div>
         <div class="field">
-          <label for="f-email">Email <span class="req">*</span></label>
-          <input id="f-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+          <label for="f-name">Name <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required aria-required="true" placeholder="Jane Doe">
+        </div>
+        <div class="field">
+          <label for="f-email">Email <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required aria-required="true" placeholder="you@example.com">
         </div>
         <div class="field">
           <label for="f-phone">Phone</label>
           <input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="(555) 123-4567">
         </div>
         <div class="field">
-          <label for="f-industry">Industry <span class="req">*</span></label>
-          <select id="f-industry" name="industry" required>
+          <label for="f-industry">Industry <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <select id="f-industry" name="industry" required aria-required="true">
             <option value="" disabled selected>Select one…</option>
-            <option>Oil & gas — upstream</option>
-            <option>Oil & gas — midstream / pipelines</option>
-            <option>Water & wastewater</option>
+            <option>Oil &amp; gas — upstream</option>
+            <option>Oil &amp; gas — midstream / pipelines</option>
+            <option>Water &amp; wastewater</option>
             <option>Wind / renewables</option>
             <option>Power generation</option>
             <option>Heavy manufacturing</option>
@@ -697,14 +581,14 @@
           </select>
         </div>
         <div class="field full">
-          <label for="f-what">What do you want to monitor? <span class="req">*</span></label>
-          <textarea id="f-what" name="what" required placeholder="What equipment, what failure modes you care about, rough scale, current monitoring setup (if any)."></textarea>
+          <label for="f-what">What are you monitoring? <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <textarea id="f-what" name="what" required aria-required="true" placeholder="What equipment, what sensors are already on it, what failure modes you care about, rough number of assets and monitoring points."></textarea>
         </div>
         <div class="form-foot">
-          <div class="hint"></div>
-          <button type="submit" class="submit">Send message <span>→</span></button>
+          <span class="form-hint" id="form-hint">Fields marked <span aria-hidden="true" style="color:var(--amber)">*</span> are required.</span>
+          <button type="submit" class="submit" aria-describedby="form-hint">Send message <span aria-hidden="true">→</span></button>
         </div>
-        <div class="form-success" id="form-success">
+        <div class="form-success" id="form-success" role="status" aria-live="polite">
           <strong style="color:var(--green)">✓ Message received.</strong> We'll be in touch shortly.
         </div>
       </form>
@@ -712,168 +596,89 @@
   </div>
 </section>
 
-<!-- FOOTER -->
-<footer>
-  <div class="wrap foot-grid">
-    <div>Osrep © 2025 — predictive maintenance at the edge</div>
-    <div class="loc"><span>Baton Rouge, LA</span></div>
-    <a href="#contact">Get in touch →</a>
-    <a href="#" style="color:var(--amber)">↑ top</a>
+<footer role="contentinfo">
+  <div class="wrap foot-row">
+    <div>Osrep © <span id="footer-year"></span> — edge processing for continuous machine state monitoring</div>
+    <div class="foot-right">
+      <span style="color:var(--mid)">Baton Rouge, LA</span>
+      <a href="#contact">Get in touch →</a>
+      <a href="#" style="color:var(--amber)" aria-label="Back to top">↑ top</a>
+    </div>
   </div>
 </footer>
 
+<noscript>
+  <p style="text-align:center;padding:12px;background:#1A1E22;color:#8A959E;font-family:monospace;font-size:13px;margin:0">
+    JavaScript is disabled. The interactive diagram is unavailable — the contact form will still submit correctly.
+  </p>
+</noscript>
+
 <script>
+  document.getElementById('footer-year').textContent = new Date().getFullYear();
+
   // Form
   const form = document.getElementById('contact-form');
   const successEl = document.getElementById('form-success');
   const submitBtn = form.querySelector('.submit');
-
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const industry = form.industry.value;
-    const what = form.what.value.trim();
-    if (!name || !email || !industry || !what) {
-      [['f-name',name],['f-email',email],['f-industry',industry],['f-what',what]].forEach(([id,v])=>{
-        const el = document.getElementById(id);
-        el.style.borderColor = v ? '' : 'var(--red)';
-        el.style.borderBottomColor = v ? '' : 'var(--red)';
-      });
-      return;
-    }
-    submitBtn.disabled = true;
-    const originalLabel = submitBtn.innerHTML;
-    submitBtn.innerHTML = 'Sending\u2026';
+    const hp = form.querySelector('[name="_gotcha"]');
+    if (hp && hp.value) return;
+    const fields = [['f-name',form.name.value.trim()],['f-email',form.email.value.trim()],['f-industry',form.industry.value],['f-what',form.what.value.trim()]];
+    let err = false;
+    fields.forEach(([id,v]) => {
+      const el = document.getElementById(id);
+      if (!v){ el.style.borderColor='var(--red)';el.style.borderBottomColor='var(--red)';el.setAttribute('aria-invalid','true');err=true; }
+      else{ el.style.borderColor='';el.style.borderBottomColor='';el.removeAttribute('aria-invalid'); }
+    });
+    if (err) return;
+    submitBtn.disabled=true;
+    const orig=submitBtn.innerHTML;
+    submitBtn.innerHTML='Sending…';
     try {
-      const res = await fetch(form.action, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json' },
-        body: new FormData(form)
-      });
-      if (res.ok) {
-        successEl.classList.add('show');
-        submitBtn.innerHTML = '\u2713 Sent';
-        form.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
-      } else {
-        const data = await res.json().catch(()=>({}));
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalLabel;
-        successEl.innerHTML = '<strong style="color:var(--red)">\u2715 Something went wrong.</strong> Please try again in a moment.' + (data.error ? ' <span style="color:var(--dim)">('+data.error+')</span>' : '');
-        successEl.style.borderColor = 'var(--red)';
-        successEl.classList.add('show');
+      const res = await fetch(form.action,{method:'POST',headers:{Accept:'application/json'},body:new FormData(form)});
+      if (res.ok){ successEl.classList.add('show');submitBtn.innerHTML='✓ Sent';form.querySelectorAll('input,select,textarea').forEach(el=>el.disabled=true); }
+      else {
+        const d=await res.json().catch(()=>({}));
+        submitBtn.disabled=false;submitBtn.innerHTML=orig;
+        successEl.innerHTML='<strong style="color:var(--red)">✕ Something went wrong.</strong> Please try again.'+(d.error?` <span style="color:var(--dim)">(${d.error})</span>`:'');
+        successEl.style.borderColor='var(--red)';successEl.classList.add('show');
       }
-    } catch (err) {
-      submitBtn.disabled = false;
-      submitBtn.innerHTML = originalLabel;
-      successEl.innerHTML = '<strong style="color:var(--red)">\u2715 Network error.</strong> Please check your connection and try again.';
-      successEl.style.borderColor = 'var(--red)';
-      successEl.classList.add('show');
-    }
+    } catch { submitBtn.disabled=false;submitBtn.innerHTML=orig;successEl.innerHTML='<strong style="color:var(--red)">✕ Network error.</strong> Check your connection.';successEl.style.borderColor='var(--red)';successEl.classList.add('show'); }
   });
 
-  // ----- LIVE WAVEFORM -----
-  const cvs = document.getElementById('wave');
-  const ctx = cvs.getContext('2d');
-  function sizeCanvas(){
-    const r = cvs.getBoundingClientRect();
-    if (r.width < 2 || r.height < 2) return; // defer if not yet laid out
-    const dpr = window.devicePixelRatio || 1;
-    cvs.width = Math.round(r.width * dpr);
-    cvs.height = Math.round(r.height * dpr);
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  sizeCanvas();
-  window.addEventListener('resize', sizeCanvas);
-  window.addEventListener('orientationchange', () => setTimeout(sizeCanvas, 150));
-  // Re-measure when element resizes (handles mobile layout settling)
-  if (window.ResizeObserver) {
-    new ResizeObserver(sizeCanvas).observe(cvs.parentElement);
-  }
-  // Retry a few times after load in case fonts/layout shift
-  [100, 400, 1000].forEach(ms => setTimeout(sizeCanvas, ms));
-
-  const N = 320;
-  let buf = new Array(N).fill(0);
-  let t = 0;
-  let anomalyUntil = 0;
-
-  const anomalyEl = document.getElementById('anomaly');
-
-  function rand(){ return Math.random()*2-1; }
-
-  function step(){
-    t += 1;
-    // base signal: superposition of a couple harmonics + noise
-    const base = 0.28*Math.sin(t*0.18) + 0.14*Math.sin(t*0.41 + 0.7) + 0.08*Math.sin(t*0.9);
-    const noise = (rand()+rand()+rand())/3 * 0.18;
-    let v = base + noise;
-
-    // occasional anomaly burst
-    if (Math.random() < 0.0015 && t > 180) {
-      anomalyUntil = t + 70;
-    }
-    const inAnomaly = t < anomalyUntil;
-    if (inAnomaly){
-      v += Math.sin(t*2.3) * 0.55 + rand()*0.25;
-    }
-
-    buf.push(v); if (buf.length > N) buf.shift();
-
-    anomalyEl.classList.toggle('on', inAnomaly);
-
-    draw(inAnomaly);
-    requestAnimationFrame(step);
-  }
-
-  function draw(anomaly){
-    const w = cvs.clientWidth, h = cvs.clientHeight;
-    ctx.clearRect(0,0,w,h);
-
-    // grid
-    ctx.strokeStyle = '#1A1D20';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let x=0;x<=w;x+=Math.max(24,w/12)){ ctx.moveTo(x,0); ctx.lineTo(x,h); }
-    for (let y=0;y<=h;y+=h/4){ ctx.moveTo(0,y); ctx.lineTo(w,y); }
-    ctx.stroke();
-
-    // zero line
-    ctx.strokeStyle = '#2A3035';
-    ctx.setLineDash([2,4]);
-    ctx.beginPath(); ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); ctx.stroke();
-    ctx.setLineDash([]);
-
-    // waveform
-    ctx.strokeStyle = anomaly ? '#FF5C5C' : '#CA4A0E';
-    ctx.lineWidth = 1.25;
-    ctx.shadowColor = anomaly ? 'rgba(255,92,92,.5)' : 'rgba(202,74,14,.45)';
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    const pts = buf;
-    for (let i=0;i<pts.length;i++){
-      const x = (i/(pts.length-1)) * w;
-      const y = h/2 - pts[i] * (h*0.38);
-      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    // trailing cursor
-    const lastX = w, lastY = h/2 - pts[pts.length-1]*(h*0.38);
-    ctx.fillStyle = anomaly ? '#FF5C5C' : '#CA4A0E';
-    ctx.beginPath(); ctx.arc(lastX-2, lastY, 2.5, 0, Math.PI*2); ctx.fill();
-  }
-  step();
-
-  // Pointer-reactive glow on monitor cards
-  document.querySelectorAll('.mon').forEach(card => {
-    card.addEventListener('mousemove', e => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
-      card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+  // Pointer glow on input cards
+  document.querySelectorAll('.input-card').forEach(c => {
+    c.addEventListener('mousemove', e => {
+      const r=c.getBoundingClientRect();
+      c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+      c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
     });
   });
+
+  // State cycling on diagram
+  const states = [
+    {dot:'nominal',label:'Nominal',since:'stable · 14d 06h 32m',hdr:'nominal',hdrCls:'green',hist:[{cls:'warn',t:' 14d ago — transient warn (resolved)'},{cls:'nominal',t:' 28d ago — nominal'}]},
+    {dot:'warn',label:'Degrading',since:'bearing acoustic ↑40% · 3h 12m',hdr:'degrading',hdrCls:'yellow',hist:[{cls:'nominal',t:' 3h ago — nominal'},{cls:'nominal',t:' 7d ago — nominal'}]},
+    {dot:'nominal',label:'Nominal',since:'resolved · 00h 04m',hdr:'nominal',hdrCls:'green',hist:[{cls:'warn',t:' 4m ago — degrading (resolved)'},{cls:'nominal',t:' 3h ago — nominal'}]},
+  ];
+  let si=0;
+  function cycleState(){
+    si=(si+1)%states.length;
+    const s=states[si];
+    document.getElementById('sp-dot').className='sp-dot '+s.dot;
+    document.getElementById('sp-label').textContent=s.label;
+    document.getElementById('sp-since').textContent=s.since;
+    const hdr=document.getElementById('hdr-state');
+    if(hdr){hdr.textContent=s.hdr;hdr.className='dw-val '+s.hdrCls;}
+    s.hist.forEach((h,i)=>{
+      const d=document.getElementById('sh'+i);
+      const t=document.getElementById('sh'+i+'t');
+      if(d)d.className='shd '+h.cls;
+      if(t)t.textContent=h.t;
+    });
+  }
+  setInterval(cycleState, 5000);
 </script>
 </body>
 </html>
