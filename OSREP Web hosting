@@ -545,7 +545,6 @@ footer{border-top:1px solid var(--line);padding:36px 0 28px;color:var(--dim);fon
       <div class="form-intro">
         <h2 id="contact-title">Tell us what you're monitoring.</h2>
         <p>We'll come back with a short assessment — whether it's a fit, what a deployment could look like at your site, and which sensors we'd need to work with.</p>
-        <div class="form-contact">— or email us at <a href="mailto:hello@osrep.ai">hello@osrep.ai</a></div>
       </div>
       <form id="contact-form" action="https://formspree.io/f/mgorpzll" method="POST" novalidate aria-label="Contact form">
         <div class="field honeypot" aria-hidden="true">
