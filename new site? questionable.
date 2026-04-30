@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>osrep.ai — One state. Every sensor. No cloud.</title>
+<meta name="description" content="OSREP deploys hardened edge processing units at your assets. They ingest every sensor already wired to your equipment, run all inference on-unit, and return a single continuous state — no raw data leaves the machine.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://osrep.ai/">
+<meta name="theme-color" content="#06080A">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://osrep.ai/">
+<meta property="og:title" content="osrep.ai — One state. Every sensor. No cloud.">
+<meta property="og:description" content="Hardened edge processing units. Multi-sensor ingestion. On-unit inference. One continuous machine state.">
+<meta property="og:image" content="https://osrep.ai/og-image.png">
+<meta property="og:site_name" content="osrep.ai">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="osrep.ai — One state. Every sensor. No cloud.">
+<meta name="twitter:image" content="https://osrep.ai/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Organization","name":"Osrep","url":"https://osrep.ai","description":"Hardened edge processing units for continuous machine state monitoring.","address":{"@type":"PostalAddress","addressLocality":"Baton Rouge","addressRegion":"LA","addressCountry":"US"}}
+</script>
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg:#06080A; --bg1:#0A0D10; --bg2:#0E1218; --bg3:#131820;
+  --line:#171D24; --line2:#1E2830; --line3:#253040;
+  --dim:#3A4D5A; --mid:#7080909; --mid:#708090; --ink:#D0D8D0; --ink2:#EDF0EA;
+  --a:#C6450A; --ahi:#E05C1A; --adim:rgba(198,69,10,.10);
+  --green:#28B862; --yellow:#C09818; --red:#DC4040; --cyan:#28A0C0;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --display:'Syne',sans-serif;
+  --ease:cubic-bezier(.22,.68,0,1.2);
+  --ease2:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--a);color:#06080A}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* Grain */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:998;opacity:.026;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* Custom cursor dot — blue brand color */
+#cursor{position:fixed;width:6px;height:6px;border-radius:50%;background:var(--cyan);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,opacity .2s;mix-blend-mode:normal}
+#cursor-ring{position:fixed;width:32px;height:32px;border-radius:50%;border:1px solid rgba(40,160,192,.4);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .35s var(--ease2),height .35s var(--ease2),border-color .35s,opacity .3s}
+body:hover #cursor{opacity:1}
+body.cursor-hover #cursor-ring{width:48px;height:48px;border-color:rgba(40,160,192,.75)}
+
+/* Layout */
+.wrap{max-width:1380px;margin:0 auto;padding:0 48px}
+@media(max-width:768px){.wrap{padding:0 20px}}
+@media(max-width:480px){.wrap{padding:0 16px}}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:500;height:58px;display:flex;align-items:center;transition:background .4s,border-color .4s}
+.nav.scrolled{background:rgba(6,8,10,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;font-weight:500}
+.brand-orb{width:8px;height:8px;border-radius:50%;background:var(--a);box-shadow:0 0 18px rgba(198,69,10,.85);animation:orb 2.4s ease-in-out infinite}
+@keyframes orb{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.65);opacity:.35}}
+.brand em{font-style:normal;color:var(--a)}
+.nav-links{display:flex;gap:36px;font-size:11px;color:var(--mid);letter-spacing:.06em}
+.nav-links a{position:relative;padding-bottom:3px;transition:color .15s}
+.nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:1px;background:var(--a);transition:right .22s}
+.nav-links a:hover{color:var(--ink2)}
+.nav-links a:hover::after{right:0}
+.nav-cta{font-size:11px;letter-spacing:.08em;padding:7px 16px;border:1px solid var(--line2);color:var(--ink);transition:all .18s}
+.nav-cta:hover{border-color:var(--a);color:var(--a)}
+/* Mobile nav */
+.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px}
+.nav-burger span{display:block;width:20px;height:1px;background:var(--ink);transition:all .2s}
+@media(max-width:800px){
+  .nav-links,.nav-cta{display:none}
+  .nav-burger{display:flex}
+  .nav.open .nav-links{display:flex;flex-direction:column;position:fixed;top:58px;left:0;right:0;background:rgba(6,8,10,.98);border-bottom:1px solid var(--line);padding:28px 20px;gap:24px;font-size:16px}
+}
+
+/* ── SCROLL REVEAL ── */
+.r{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease2),transform .9s var(--ease2)}
+.r.in{opacity:1;transform:none}
+.r.d1{transition-delay:.1s}.r.d2{transition-delay:.18s}.r.d3{transition-delay:.26s}.r.d4{transition-delay:.34s}.r.d5{transition-delay:.42s}
+@media(prefers-reduced-motion:reduce){.r{opacity:1;transform:none;transition:none}}
+
+/* ── HERO ── */
+.hero{min-height:100svh;position:relative;overflow:hidden;display:grid;grid-template-rows:1fr auto;padding-top:58px}
+#bg-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero-content{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:80px 0 60px}
+@media(max-width:960px){.hero-content{grid-template-columns:1fr;gap:48px;padding:60px 0 40px}}
+
+.hero-left{}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:32px}
+.eyebrow-tick{width:28px;height:1px;background:var(--a)}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--a);animation:orb 2s infinite}
+.eyebrow em{font-style:normal;color:var(--a)}
+
+h1.hl{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(52px,8.5vw,118px);
+  line-height:.91;letter-spacing:-.045em;
+  color:var(--ink2);margin-bottom:36px;
+}
+.hl .stroke{
+  display:block;color:transparent;
+  -webkit-text-stroke:1.5px var(--a);
+  position:relative;
+}
+.hl .filled{
+  display:block;
+  background:linear-gradient(108deg,var(--ink2) 0%,var(--mid) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hl .amber-fill{
+  display:block;
+  background:linear-gradient(108deg,var(--a) 0%,var(--ahi) 60%,var(--a) 100%);
+  background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shine 5s linear infinite;
+}
+@keyframes shine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.hero-sub{font-size:clamp(14px,1.5vw,16px);line-height:1.85;color:var(--mid);max-width:48ch;margin-bottom:44px}
+.hero-sub strong{color:var(--ink);font-weight:500}
+.hero-sub em{font-style:normal;color:var(--a)}
+
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+
+/* Buttons */
+.btn-p{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;background:var(--a);color:#06080A;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;cursor:pointer;position:relative;overflow:hidden;transition:background .2s,transform .2s,box-shadow .2s;touch-action:manipulation}
+.btn-p::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);transform:translateX(-100%);transition:transform .5s}
+.btn-p:hover{background:var(--ahi);transform:translateY(-2px);box-shadow:0 16px 40px -12px rgba(198,69,10,.55)}
+.btn-p:hover::after{transform:translateX(100%)}
+.btn-g{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border:1px solid var(--line2);color:var(--ink);font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;transition:border-color .18s,color .18s;touch-action:manipulation}
+.btn-g:hover{border-color:var(--ink);color:var(--ink2)}
+.arr{transition:transform .18s}
+.btn-p:hover .arr,.btn-g:hover .arr{transform:translateX(4px)}
+
+/* ── HERO RIGHT — TOPOLOGY DIAGRAM ── */
+.topo-wrap{position:relative}
+.topo-frame{
+  border:1px solid var(--line2);
+  background:linear-gradient(160deg,rgba(14,18,24,.96),rgba(6,8,10,.98));
+  position:relative;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(198,69,10,.06),0 40px 80px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.03);
+}
+/* Top scan line */
+.topo-frame::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,var(--a),transparent);opacity:.5;z-index:3;pointer-events:none}
+.topo-head{display:flex;align-items:stretch;border-bottom:1px solid var(--line);font-size:10px;color:var(--mid);position:relative;z-index:2}
+.th-cell{padding:8px 14px;border-right:1px solid var(--line);display:flex;align-items:center;gap:7px}
+.th-cell:last-child{border-right:none;margin-left:auto}
+.th-lbl{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.th-val{color:var(--ink)}
+.th-val.a{color:var(--a)}
+.th-val.g{color:var(--green)}
+.th-val.y{color:var(--yellow)}
+.th-val.r{color:var(--red)}
+
+/* The canvas inside topo */
+#topo-canvas{display:block;width:100%;aspect-ratio:4/3}
+
+/* Corner ticks */
+.cx{position:absolute;width:12px;height:12px;border-color:rgba(198,69,10,.4);border-style:solid;pointer-events:none;z-index:4}
+.cx.tl{top:-1px;left:-1px;border-width:1.5px 0 0 1.5px}
+.cx.tr{top:-1px;right:-1px;border-width:1.5px 1.5px 0 0}
+.cx.bl{bottom:-1px;left:-1px;border-width:0 0 1.5px 1.5px}
+.cx.br{bottom:-1px;right:-1px;border-width:0 1.5px 1.5px 0}
+
+.topo-foot{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-top:1px solid var(--line);font-size:9px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+
+/* Parallax layers in hero */
+.hero-bg-glow{position:absolute;pointer-events:none;border-radius:50%;filter:blur(60px);z-index:1}
+.glow-a{width:800px;height:800px;top:-200px;right:-200px;background:radial-gradient(circle,rgba(198,69,10,.08),transparent 70%);transition:transform .1s linear}
+.glow-b{width:500px;height:500px;bottom:-100px;left:-100px;background:radial-gradient(circle,rgba(40,160,192,.05),transparent 70%)}
+
+/* ── STAT STRIP ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg1)}
+.stat{padding:24px 32px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:none}
+.stat-k{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.stat-v{font-family:var(--display);font-size:clamp(26px,3vw,42px);font-weight:700;color:var(--ink2);letter-spacing:-.03em;line-height:1}
+.stat-v .u{font-size:.45em;color:var(--dim);margin-left:3px;font-weight:400}
+@media(max-width:768px){
+  .stats{grid-template-columns:1fr 1fr}
+  .stat{padding:18px 20px}
+  .stat:nth-child(2){border-right:none}
+  .stat:nth-child(3),.stat:nth-child(4){border-top:1px solid var(--line)}
+  .stat:nth-child(4){border-right:none}
+}
+@media(max-width:480px){
+  .stats{grid-template-columns:1fr}
+  .stat{border-right:none;border-bottom:1px solid var(--line)}
+  .stat:last-child{border-bottom:none}
+}
+
+/* ── SECTION BASE ── */
+.sec{padding:120px 0;position:relative}
+@media(max-width:768px){.sec{padding:72px 0}}
+.sec-lbl{display:inline-flex;align-items:center;gap:14px;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--a);margin-bottom:52px}
+.sec-lbl::before{content:"";width:24px;height:1px;background:var(--a)}
+.sec-h{font-family:var(--display);font-size:clamp(34px,5vw,68px);font-weight:700;letter-spacing:-.035em;line-height:1.01;color:var(--ink2);margin-bottom:20px}
+.sec-p{font-size:15px;line-height:1.82;color:var(--mid);max-width:56ch}
+
+/* ── HOW IT WORKS ── */
+.how-bg{background:var(--bg1)}
+.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+@media(max-width:900px){.how-grid{grid-template-columns:1fr;gap:40px}}
+
+.steps{display:flex;flex-direction:column;margin-top:16px}
+.step{
+  border-bottom:1px solid var(--line);
+  padding:28px 0 28px 0;
+  display:grid;grid-template-columns:56px 1fr;gap:0 20px;
+  cursor:pointer;position:relative;
+  transition:background .2s;
+}
+.step:first-child{border-top:1px solid var(--line)}
+.step.on{background:linear-gradient(90deg,rgba(198,69,10,.06),transparent 80%)}
+/* Active left bar */
+.step::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--a);transform:scaleY(0);transform-origin:top;transition:transform .4s var(--ease2)}
+.step.on::before{transform:scaleY(1)}
+
+.step-n{font-family:var(--display);font-size:44px;font-weight:800;color:var(--line3);line-height:1;transition:color .3s;text-align:center;padding-top:2px}
+.step.on .step-n{color:var(--a)}
+
+.step-body h3{font-family:var(--display);font-size:19px;font-weight:600;letter-spacing:-.02em;color:var(--ink2);margin-bottom:0;transition:color .2s}
+.step.on .step-body h3{color:var(--a)}
+.step-body p{font-size:13px;color:var(--mid);line-height:1.78;max-height:0;overflow:hidden;opacity:0;transition:max-height .45s var(--ease2),opacity .3s,margin .3s}
+.step.on .step-body p{max-height:180px;opacity:1;margin-top:10px}
+
+/* How canvas */
+.how-visual{position:sticky;top:80px}
+#how-cv{display:block;width:100%;aspect-ratio:4/3;border:1px solid var(--line);background:var(--bg)}
+.how-cv-note{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-align:center;margin-top:10px}
+
+/* ── INPUTS ── */
+.inp-sec{background:var(--bg)}
+.inp-head{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;margin-bottom:56px}
+@media(max-width:768px){.inp-head{grid-template-columns:1fr}}
+
+.inp-grid{display:grid;grid-template-columns:repeat(12,1fr);border:1px solid var(--line)}
+.ic{padding:30px 28px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg1);position:relative;overflow:hidden;transition:background .22s}
+.ic:hover{background:var(--bg2)}
+.ic.w6{grid-column:span 6}.ic.w4{grid-column:span 4}.ic.w12{grid-column:span 12;border-bottom:none}.ic.nr{border-right:none}
+.ic::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .28s;background:radial-gradient(420px 300px at var(--mx,50%) var(--my,50%),rgba(198,69,10,.07),transparent 68%)}
+.ic:hover::before{opacity:1}
+/* Corner clip */
+.ic::after{content:"";position:absolute;top:0;right:0;border-left:1px solid var(--line2);border-bottom:1px solid var(--line2);width:40px;height:40px;clip-path:polygon(100% 0,100% 100%,0 100%);opacity:.5}
+
+.ic-tag{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--a);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.ic-tag::before{content:"//";color:var(--dim)}
+.ic h3{font-family:var(--display);font-size:21px;font-weight:600;letter-spacing:-.025em;color:var(--ink2);margin-bottom:10px;transition:color .2s}
+.ic:hover h3{color:var(--a)}
+.ic p{font-size:13px;color:var(--mid);line-height:1.7;max-width:42ch}
+.ic-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+.pill{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:4px 8px;border:1px solid var(--line2)}
+.ic-bg-svg{position:absolute;bottom:0;right:0;width:44%;height:62%;opacity:.1;pointer-events:none}
+
+@media(max-width:900px){
+  .inp-grid{grid-template-columns:1fr}
+  .ic{grid-column:span 12!important;border-right:none!important}
+}
+
+/* ── OUTPUTS ── */
+.out-sec{background:var(--bg1)}
+.out-cols{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);margin-top:56px}
+.oc{padding:44px 36px;border-right:1px solid var(--line);background:var(--bg2);position:relative;overflow:hidden;transition:background .25s}
+.oc:last-child{border-right:none}
+.oc:hover{background:var(--bg3)}
+/* Bottom sweep on hover */
+.oc::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--a);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease2)}
+.oc:hover::after{transform:scaleX(1)}
+/* Big number watermark */
+.oc-n{font-family:var(--display);font-size:80px;font-weight:800;color:var(--line);line-height:1;margin-bottom:20px;transition:color .3s}
+.oc:hover .oc-n{color:var(--line2)}
+.oc h3{font-family:var(--display);font-size:20px;font-weight:600;letter-spacing:-.02em;color:var(--ink2);margin-bottom:12px}
+.oc p{font-size:13px;color:var(--mid);line-height:1.78}
+.oc p strong{color:var(--ink);font-weight:500}
+@media(max-width:900px){
+  .out-cols{grid-template-columns:1fr}
+  .oc{border-right:none;border-bottom:1px solid var(--line)}
+  .oc:last-child{border-bottom:none}
+}
+
+/* NOTE */
+.note{margin-top:36px;padding:22px 28px;border-left:2px solid var(--a);background:var(--bg2);font-size:14px;color:var(--mid);line-height:1.78;max-width:80ch}
+.note strong{color:var(--ink);font-weight:500}
+
+/* ── CALLOUT BAND ── */
+.callout{background:var(--a);padding:72px 0;position:relative;overflow:hidden}
+.callout::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 36px,rgba(0,0,0,.04) 36px,rgba(0,0,0,.04) 37px)}
+.callout-inner{display:flex;align-items:center;justify-content:space-between;gap:48px;flex-wrap:wrap;position:relative;z-index:1}
+.callout h2{font-family:var(--display);font-size:clamp(28px,4.5vw,58px);font-weight:800;letter-spacing:-.04em;color:#06080A;line-height:1;margin-bottom:10px}
+.callout p{font-size:15px;color:rgba(6,8,10,.6);line-height:1.6}
+.btn-dark{display:inline-flex;align-items:center;gap:10px;padding:16px 28px;background:#06080A;color:var(--a);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transition:background .18s,color .18s;touch-action:manipulation}
+.btn-dark:hover{background:var(--ink2);color:#06080A}
+
+/* ── CONTACT ── */
+.contact-sec{background:var(--bg);padding-bottom:100px}
+.contact-wrap{display:grid;grid-template-columns:300px 1fr;gap:48px;border:1px solid var(--line);padding:48px;position:relative;background:linear-gradient(140deg,var(--bg1),var(--bg));overflow:hidden}
+@media(max-width:1100px){.contact-wrap{grid-template-columns:1fr;padding:36px 24px;gap:36px}}
+.contact-intro h2{font-family:var(--display);font-size:clamp(26px,3.2vw,44px);font-weight:700;letter-spacing:-.035em;color:var(--ink2);margin-bottom:18px;line-height:1.08}
+.contact-intro p{font-size:14px;color:var(--mid);line-height:1.78;margin-bottom:24px}
+.contact-sub{font-size:12px;color:var(--dim);border-top:1px dashed var(--line2);padding-top:18px;margin-top:20px}
+.contact-sub a{color:var(--a);transition:color .15s}
+.contact-sub a:hover{color:var(--ahi)}
+
+.cform{display:grid;grid-template-columns:1fr 1fr;gap:26px 32px}
+@media(max-width:600px){.cform{grid-template-columns:1fr}}
+.f{display:flex;flex-direction:column;gap:7px}
+.f.full{grid-column:1/-1}
+.f.hp{position:absolute;left:-9999px;top:0;width:1px;height:1px;overflow:hidden}
+.f label{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between}
+.req{color:var(--a)}
+.f input,.f select,.f textarea{font-family:var(--mono);font-size:13px;background:transparent;border:none;border-bottom:1px solid var(--line2);color:var(--ink);padding:10px 0;outline:none;-webkit-appearance:none;appearance:none;border-radius:0;transition:border-color .18s}
+.f input:focus,.f select:focus,.f textarea:focus{border-bottom-color:var(--a)}
+.f textarea{min-height:120px;resize:vertical;border:1px solid var(--line2);padding:14px}
+.f textarea:focus{border-color:var(--a)}
+.f select{background-image:linear-gradient(45deg,transparent 50%,var(--mid) 50%),linear-gradient(135deg,var(--mid) 50%,transparent 50%);background-position:calc(100% - 14px) 18px,calc(100% - 9px) 18px;background-size:5px 5px;background-repeat:no-repeat;padding-right:28px;cursor:pointer}
+.f select option{background:var(--bg1);color:var(--ink)}
+.form-ft{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding-top:20px;border-top:1px dashed var(--line2);margin-top:4px}
+.form-hint{font-size:11px;color:var(--dim)}
+.sub-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 28px;background:var(--a);color:#06080A;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;cursor:pointer;position:relative;overflow:hidden;transition:background .2s,transform .18s,box-shadow .2s;touch-action:manipulation}
+.sub-btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);transform:translateX(-100%);transition:transform .5s}
+.sub-btn:hover{background:var(--ahi);transform:translateY(-1px);box-shadow:0 10px 30px -8px rgba(198,69,10,.5)}
+.sub-btn:hover::after{transform:translateX(100%)}
+.sub-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.form-ok{grid-column:1/-1;padding:20px 24px;border:1px solid var(--green);background:rgba(40,184,98,.04);font-size:13px;color:var(--ink);display:none}
+.form-ok.show{display:block}
+/* Corner marks */
+.cx2{position:absolute;width:13px;height:13px;border-color:rgba(198,69,10,.35);border-style:solid;pointer-events:none}
+.cx2.tl{top:-1px;left:-1px;border-width:1.5px 0 0 1.5px}
+.cx2.tr{top:-1px;right:-1px;border-width:1.5px 1.5px 0 0}
+.cx2.bl{bottom:-1px;left:-1px;border-width:0 0 1.5px 1.5px}
+.cx2.br{bottom:-1px;right:-1px;border-width:0 1.5px 1.5px 0}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--line);padding:30px 0;background:var(--bg1)}
+.foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;font-size:11px;color:var(--dim);letter-spacing:.06em}
+.foot-r{display:flex;gap:22px;align-items:center}
+.foot-r a{transition:color .15s}
+.foot-r a:hover{color:var(--a)}
+
+:focus-visible{outline:2px solid var(--a);outline-offset:3px}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor" aria-hidden="true"></div>
+<div id="cursor-ring" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+  <div class="wrap nav-inner">
+    <a href="/" class="brand" aria-label="osrep.ai home">
+      <span class="brand-orb" aria-hidden="true"></span>
+      osrep<em>.</em>ai
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#inputs">What we ingest</a>
+      <a href="#outputs">What we return</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="#contact" class="nav-cta">Get in touch →</a>
+    <button class="nav-burger" id="burger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" aria-labelledby="hero-h">
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="hero-bg-glow glow-a" id="glow-a" aria-hidden="true"></div>
+  <div class="hero-bg-glow glow-b" aria-hidden="true"></div>
+
+  <div class="wrap hero-content">
+
+    <!-- LEFT: Copy -->
+    <div class="hero-left">
+      <div class="hero-eyebrow r" aria-hidden="true">
+        <span class="eyebrow-tick"></span>
+        <span class="eyebrow-dot"></span>
+        [<em>unit.status</em>] edge processors — deployed
+      </div>
+
+      <h1 class="hl r d1" id="hero-h">
+        <span class="stroke">Every</span>
+        <span class="stroke">sensor.</span>
+        <span class="amber-fill">One state.</span>
+      </h1>
+
+      <p class="hero-sub r d2">
+        We deploy <strong>hardened edge processing units</strong> at your assets.
+        Each unit ingests every sensor wired to that point,
+        runs all inference <em>on the unit</em>, and returns a
+        single continuous machine state.
+        <strong>No raw data leaves the asset.</strong>
+      </p>
+
+      <div class="hero-actions r d3">
+        <a href="#contact" class="btn-p">Get in touch <span class="arr" aria-hidden="true">→</span></a>
+        <a href="#how" class="btn-g">How it works <span class="arr" aria-hidden="true">↓</span></a>
+      </div>
+    </div>
+
+    <!-- RIGHT: Topology diagram -->
+    <div class="topo-wrap r d2" aria-label="Interactive diagram: multiple sensor inputs flowing into OSREP edge unit, outputting a single machine state">
+      <div class="topo-frame">
+        <span class="cx tl" aria-hidden="true"></span>
+        <span class="cx tr" aria-hidden="true"></span>
+        <span class="cx bl" aria-hidden="true"></span>
+        <span class="cx br" aria-hidden="true"></span>
+
+        <div class="topo-head" aria-hidden="true">
+          <div class="th-cell"><span class="th-lbl">view</span><span class="th-val">edge unit topology — live</span></div>
+          <div class="th-cell"><span class="th-lbl">unit</span><span class="th-val a">OSREP-1 · asset 04</span></div>
+          <div class="th-cell"><span class="th-lbl">state</span><span class="th-val g" id="hdr-state">nominal</span></div>
+        </div>
+
+        <canvas id="topo-canvas" aria-hidden="true"></canvas>
+
+        <div class="topo-foot" aria-hidden="true">
+          <span>// illustrative · not real data</span>
+          <span id="topo-uptime">uptime: 14d 06h 32m</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /hero-content -->
+
+  <!-- Scroll cue -->
+  <div style="position:relative;z-index:2;padding-bottom:32px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);animation:bob 2.2s ease-in-out infinite" aria-hidden="true">
+    <div style="width:1px;height:36px;background:linear-gradient(to bottom,var(--a),transparent)"></div>
+    scroll
+  </div>
+</section>
+<style>@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}</style>
+
+<!-- STATS -->
+<div class="stats" aria-label="Key specifications">
+  <div class="stat r"><div class="stat-k">Sensor inputs</div><div class="stat-v">Any<span class="u">type</span></div></div>
+  <div class="stat r d1"><div class="stat-k">State outputs</div><div class="stat-v">1<span class="u">per unit</span></div></div>
+  <div class="stat r d2"><div class="stat-k">Cloud dependency</div><div class="stat-v">0<span class="u">required</span></div></div>
+  <div class="stat r d3"><div class="stat-k">Raw data egress</div><div class="stat-v">None</div></div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="sec how-bg" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="sec-lbl r">how it works</div>
+    <div class="how-grid">
+
+      <div>
+        <h2 class="sec-h r" id="how-h">Deploy.<br>Ingest.<br>Return a state.</h2>
+        <p class="sec-p r d1" style="margin-bottom:32px">Three steps. All intelligence stays at the asset. What comes back is a state, not a firehose.</p>
+
+        <div class="steps r d2" id="steps">
+          <div class="step on" data-step="0" tabindex="0" role="button" aria-expanded="true">
+            <div class="step-n">01</div>
+            <div class="step-body">
+              <h3>Mount the unit</h3>
+              <p>An OSREP edge processing unit mounts at each monitoring point. It connects to <strong>whatever sensors are already wired there</strong> — no rip-and-replace. Handles acoustic, vibration, thermal, electrical, and process inputs natively.</p>
+            </div>
+          </div>
+          <div class="step" data-step="1" tabindex="0" role="button" aria-expanded="false">
+            <div class="step-n">02</div>
+            <div class="step-body">
+              <h3>Learn on-unit</h3>
+              <p>After a short commissioning window, the unit has modeled <strong>this specific asset at this specific point</strong>. Learning happens entirely on the hardware — no data leaves, no cloud loop. Identical units produce different models on different machines.</p>
+            </div>
+          </div>
+          <div class="step" data-step="2" tabindex="0" role="button" aria-expanded="false">
+            <div class="step-n">03</div>
+            <div class="step-body">
+              <h3>Emit a state</h3>
+              <p>From that point on, the unit monitors all sensor inputs and emits a <strong>single state</strong>: nominal, degrading, or fault — with confidence and time-in-state. Your operators get signal, not noise.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How canvas -->
+      <div class="how-visual r d3">
+        <canvas id="how-cv" aria-label="Animated visualization of OSREP pipeline for current step"></canvas>
+        <p class="how-cv-note">hover steps to explore · auto-advances when idle</p>
+      </div>
+
+    </div>
+
+    <div class="note r" role="note" style="margin-top:60px">
+      <strong>Why state and not data?</strong> Raw sensor streams are expensive to transmit, store, and interpret at scale. A state is an already-interpreted answer. When it changes, you know something changed — and the unit tells you which input drove it. Intelligence without the data tax.
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE INGEST -->
+<section class="sec inp-sec" id="inputs" aria-labelledby="inp-h">
+  <div class="wrap">
+    <div class="sec-lbl r">what we ingest</div>
+    <div class="inp-head">
+      <h2 class="sec-h r" id="inp-h">If it's wired to<br>the asset,<br>we read it.</h2>
+      <p class="sec-p r d1">The unit is sensor-agnostic. Our core work is acoustic and vibration — but the on-unit architecture ingests any signal with a stationary baseline. You bring the sensors already on your equipment; we bring the intelligence layer on top.</p>
+    </div>
+
+    <div class="inp-grid r" role="list">
+      <div class="ic w6" role="listitem">
+        <div class="ic-tag">acoustic</div>
+        <h3>Ultrasound</h3>
+        <p>Failure signatures in the ultrasonic band — bearing friction, cavitation, turbulence, valve chatter, electrical arcing. Often the earliest indicator of mechanical degradation.</p>
+        <div class="ic-pills"><span class="pill">contact probe</span><span class="pill">airborne</span><span class="pill">structure-borne</span></div>
+        <svg class="ic-bg-svg" viewBox="0 0 200 120" fill="none" stroke="#C6450A" stroke-width="1" aria-hidden="true" focusable="false">
+          <path d="M5 60 Q15 20 25 60 T45 60 T65 60 T85 60 T105 60 T125 60 T145 60 T165 60" stroke-dasharray="1 2"/>
+          <path d="M5 60 Q20 10 35 60 T65 60 T95 60 T125 60 T155 60"/>
+          <circle cx="5" cy="60" r="3" fill="#C6450A"/><circle cx="165" cy="60" r="3" fill="#C6450A"/>
+        </svg>
+      </div>
+      <div class="ic w6 nr" role="listitem">
+        <div class="ic-tag">vibration</div>
+        <h3>Accelerometer</h3>
+        <p>Mechanical signatures of rotating and reciprocating equipment — imbalance, misalignment, bearing race defects, gear-mesh faults, looseness, resonance. The unit learns each machine's harmonic fingerprint.</p>
+        <div class="ic-pills"><span class="pill">radial</span><span class="pill">axial</span><span class="pill">triaxial</span></div>
+        <svg class="ic-bg-svg" viewBox="0 0 200 120" fill="none" stroke="#C6450A" stroke-width="1" aria-hidden="true" focusable="false">
+          <line x1="5" y1="60" x2="195" y2="60" stroke="#1A1E22"/>
+          <path d="M5 60 L20 60 L25 28 L32 92 L39 42 L46 78 L53 58 L68 62 L80 20 L94 100 L108 58 L122 62 L136 18 L148 102 L160 58 L175 62 L190 60"/>
+          <line x1="5" y1="16" x2="5" y2="104"/>
+        </svg>
+      </div>
+      <div class="ic w4" role="listitem">
+        <div class="ic-tag">thermal</div>
+        <h3>Temperature</h3>
+        <p>Bearing hot-spots, motor winding rise, heat exchanger fouling. Thermal inputs contextualize acoustic and vibration — a bearing fault reads differently at 40°C vs 110°C.</p>
+        <div class="ic-pills"><span class="pill">thermocouple</span><span class="pill">RTD</span><span class="pill">IR</span></div>
+      </div>
+      <div class="ic w4" role="listitem">
+        <div class="ic-tag">process</div>
+        <h3>Pressure &amp; flow</h3>
+        <p>Line pressure, differential pressure, flow rate. Cavitation, blockage, and valve wear all present in process data before they escalate to mechanical failure.</p>
+        <div class="ic-pills"><span class="pill">4–20 mA</span><span class="pill">HART</span></div>
+      </div>
+      <div class="ic w4 nr" role="listitem">
+        <div class="ic-tag">electrical</div>
+        <h3>Current &amp; power</h3>
+        <p>Motor current signature analysis, power factor, voltage imbalance. Rotor bar faults, coupling issues, and bearing wear all leave electrical traces the unit learns to read.</p>
+        <div class="ic-pills"><span class="pill">CT clamp</span><span class="pill">inline</span></div>
+      </div>
+      <div class="ic w12" role="listitem">
+        <div class="ic-tag">anything else</div>
+        <h3>Bring what you have.</h3>
+        <p>Strain, optical, magnetic, proximity, chemical — if the signal has a stationary baseline, the on-unit model can learn it. Most industrial sites already have instrumentation running to PLCs or historians. We connect to what's there and work with you on integration before deployment.</p>
+        <div class="ic-pills"><span class="pill">analog</span><span class="pill">digital</span><span class="pill">Modbus</span><span class="pill">HART</span><span class="pill">OPC-UA</span><span class="pill">MQTT</span><span class="pill">custom</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE RETURN -->
+<section class="sec out-sec" id="outputs" aria-labelledby="out-h">
+  <div class="wrap">
+    <div class="sec-lbl r">what we return</div>
+    <h2 class="sec-h r" id="out-h">A state,<br>not a stream.</h2>
+    <p class="sec-p r d1">Raw sensor data stays on the unit. What travels upstream is already interpreted — actionable without further processing.</p>
+
+    <div class="out-cols r">
+      <div class="oc">
+        <div class="oc-n" aria-hidden="true">01</div>
+        <h3>Continuous machine state</h3>
+        <p>Every unit emits a rolling state: <strong>nominal, degrading, or fault</strong> — with confidence value and time-in-state. Updates in real time. If it hasn't changed, you don't need to do anything.</p>
+      </div>
+      <div class="oc">
+        <div class="oc-n" aria-hidden="true">02</div>
+        <h3>Input attribution</h3>
+        <p>When state changes, the unit tells you which sensor drove it and by how much. <strong>Cause, not just symptom</strong> — bearing acoustic up 40%, temperature nominal, vibration nominal. That's a bearing starting to go.</p>
+      </div>
+      <div class="oc">
+        <div class="oc-n" aria-hidden="true">03</div>
+        <h3>Fleet-level visibility</h3>
+        <p>Deploy across multiple points per asset or an entire fleet. Your operations layer sees a <strong>clean grid of states</strong> — not a wall of waveforms nobody has time to read.</p>
+      </div>
+    </div>
+
+    <div class="note r" role="note">
+      <strong>Where do the states go?</strong> We output over standard industrial protocols — Modbus, OPC-UA, MQTT — so states drop into your existing SCADA, historian, or operations platform without a new integration stack. We can also provide a lightweight web dashboard.
+    </div>
+  </div>
+</section>
+
+<!-- CALLOUT -->
+<div class="callout r" aria-label="Call to action">
+  <div class="wrap callout-inner">
+    <div>
+      <h2>Hard tech.<br>Clear signal.</h2>
+      <p>One unit. Every sensor. The only output that matters.</p>
+    </div>
+    <a href="#contact" class="btn-dark r d2">Talk to us <span aria-hidden="true">→</span></a>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section class="sec contact-sec" id="contact" aria-labelledby="contact-h" style="padding-top:80px">
+  <div class="wrap">
+    <div class="sec-lbl r">contact</div>
+    <div class="contact-wrap r">
+      <span class="cx2 tl" aria-hidden="true"></span>
+      <span class="cx2 tr" aria-hidden="true"></span>
+      <span class="cx2 bl" aria-hidden="true"></span>
+      <span class="cx2 br" aria-hidden="true"></span>
+
+      <div class="contact-intro">
+        <h2 id="contact-h">Tell us what you're monitoring.</h2>
+        <p>We'll come back with a short assessment — whether it's a fit, what a deployment looks like at your site, and which sensors we'd work with.</p>
+        <div class="contact-sub">— or email <a href="mailto:hello@osrep.ai">hello@osrep.ai</a></div>
+      </div>
+
+      <form class="cform" id="cform" action="https://formspree.io/f/mgorpzll" method="POST" novalidate aria-label="Contact form">
+        <div class="f hp" aria-hidden="true">
+          <label for="f-hp">Website</label>
+          <input id="f-hp" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="f">
+          <label for="fn">Name <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <input id="fn" name="name" type="text" autocomplete="name" required aria-required="true" placeholder="Jane Doe">
+        </div>
+        <div class="f">
+          <label for="fe">Email <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <input id="fe" name="email" type="email" autocomplete="email" required aria-required="true" placeholder="you@example.com">
+        </div>
+        <div class="f">
+          <label for="fp">Phone</label>
+          <input id="fp" name="phone" type="tel" autocomplete="tel" placeholder="(555) 123-4567">
+        </div>
+        <div class="f">
+          <label for="fi">Industry <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <select id="fi" name="industry" required aria-required="true">
+            <option value="" disabled selected>Select one…</option>
+            <option>Oil &amp; gas — upstream</option>
+            <option>Oil &amp; gas — midstream / pipelines</option>
+            <option>Water &amp; wastewater</option>
+            <option>Wind / renewables</option>
+            <option>Power generation</option>
+            <option>Heavy manufacturing</option>
+            <option>Chemicals / process</option>
+            <option>Mining</option>
+            <option>Civil infrastructure</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="f full">
+          <label for="fw">What are you monitoring? <span class="req" aria-hidden="true">*</span><span class="sr-only">(required)</span></label>
+          <textarea id="fw" name="what" required aria-required="true" placeholder="Equipment, sensors already on it, failure modes you care about, scale."></textarea>
+        </div>
+        <div class="form-ft">
+          <span class="form-hint" id="form-hint">Fields marked <span style="color:var(--a)" aria-hidden="true">*</span> required.</span>
+          <button type="submit" class="sub-btn" aria-describedby="form-hint">Send message <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="form-ok" id="form-ok" role="status" aria-live="polite">
+          <strong style="color:var(--green)">✓ Message received.</strong> We'll be in touch shortly.
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer role="contentinfo">
+  <div class="wrap foot">
+    <div>Osrep © <span id="fy"></span> — edge processing for continuous machine state monitoring · Baton Rouge, LA</div>
+    <div class="foot-r">
+      <a href="#contact">Contact →</a>
+      <a href="#" style="color:var(--a)" aria-label="Back to top">↑ top</a>
+    </div>
+  </div>
+</footer>
+
+<noscript>
+  <style>.r{opacity:1;transform:none}</style>
+</noscript>
+
+<script>
+'use strict';
+/* ── UTILITIES ── */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+/* ── YEAR ── */
+$('#fy').textContent = new Date().getFullYear();
+
+/* ── CUSTOM CURSOR ── */
+const cur = $('#cursor'), ring = $('#cursor-ring');
+let mx = -100, my = -100, rx = -100, ry = -100;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function tickCursor() {
+  rx = lerp(rx, mx, .12); ry = lerp(ry, my, .12);
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(tickCursor);
+})();
+$$('a,button,.step,.ic,.oc').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+});
+
+/* ── NAV ── */
+const nav = $('#nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 50), { passive: true });
+$('#burger').addEventListener('click', function() {
+  const open = nav.classList.toggle('open');
+  this.setAttribute('aria-expanded', open);
+});
+
+/* ── SCROLL REVEAL ── */
+const ro = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); } });
+}, { threshold: .1, rootMargin: '0px 0px -36px 0px' });
+$$('.r').forEach(el => ro.observe(el));
+
+/* ── MOUSE PARALLAX on HERO GLOW ── */
+const glowA = $('#glow-a');
+document.addEventListener('mousemove', e => {
+  const xPct = e.clientX / window.innerWidth - .5;
+  const yPct = e.clientY / window.innerHeight - .5;
+  if (glowA) glowA.style.transform = `translate(${xPct * -40}px, ${yPct * -30}px)`;
+}, { passive: true });
+
+/* ── BG CANVAS — particle network ── */
+(function () {
+  const cv = $('#bg-canvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, pts, raf;
+  const N = window.innerWidth < 768 ? 35 : 65;
+  const DIST = 130;
+  const AM = [198, 69, 10];
+
+  function resize() { W = cv.width = cv.offsetWidth; H = cv.height = cv.offsetHeight; }
+
+  function mkPt() {
+    return { x: Math.random()*W, y: Math.random()*H, vx: (Math.random()-.5)*.25, vy: (Math.random()-.5)*.25, r: Math.random()*1.2+.4, o: Math.random()*.4+.15 };
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    for (let i=0;i<pts.length;i++) {
+      pts[i].x+=pts[i].vx; pts[i].y+=pts[i].vy;
+      if(pts[i].x<0)pts[i].x=W; if(pts[i].x>W)pts[i].x=0;
+      if(pts[i].y<0)pts[i].y=H; if(pts[i].y>H)pts[i].y=0;
+      for(let j=i+1;j<pts.length;j++){
+        const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.hypot(dx,dy);
+        if(d<DIST){ ctx.strokeStyle=`rgba(${AM},${(1-d/DIST)*.1})`; ctx.lineWidth=.5; ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke(); }
+      }
+      ctx.beginPath(); ctx.arc(pts[i].x,pts[i].y,pts[i].r,0,6.28); ctx.fillStyle=`rgba(${AM},${pts[i].o})`; ctx.fill();
+    }
+    raf = requestAnimationFrame(draw);
+  }
+  document.addEventListener('visibilitychange', () => { if(document.hidden)cancelAnimationFrame(raf); else raf=requestAnimationFrame(draw); });
+  window.addEventListener('resize', resize, {passive:true});
+  resize(); pts = Array.from({length:N}, mkPt); raf=requestAnimationFrame(draw);
+})();
+
+/* ── TOPOLOGY CANVAS (hero right) ── */
+(function () {
+  const cv = $('#topo-canvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, raf, t = 0;
+
+  const SENSORS = [
+    {label:'USN', name:'Ultrasound',   color:'#C6450A'},
+    {label:'ACC', name:'Accelerometer',color:'#C6450A'},
+    {label:'TMP', name:'Temperature',  color:'#28A0C0'},
+    {label:'PSI', name:'Pressure',     color:'#28A0C0'},
+    {label:'AMP', name:'Current',      color:'#C09818'},
+  ];
+  const STATES = [
+    {label:'Nominal',   cls:'g', dot:'#28B862', dur:280},
+    {label:'Degrading', cls:'y', dot:'#C09818', dur:180},
+    {label:'Nominal',   cls:'g', dot:'#28B862', dur:220},
+    {label:'Fault',     cls:'r', dot:'#DC4040', dur:100},
+  ];
+  let stIdx=0, stTimer=0;
+  const flows = SENSORS.map(()=>({t:Math.random()}));
+
+  function resize() {
+    const r = cv.parentElement.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio||1, 2);
+    const w = r.width; const h = w * .75;
+    cv.width = w*dpr; cv.height = h*dpr;
+    cv.style.width = w+'px'; cv.style.height = h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    W=w; H=h;
+  }
+
+  function bez(p0,p1,p2,p3,t){ const m=1-t; return m*m*m*p0+3*m*m*t*p1+3*m*t*t*p2+t*t*t*p3; }
+
+  function tick() {
+    t++; stTimer++;
+    const st = STATES[stIdx];
+    if (stTimer > st.dur) { stTimer=0; stIdx=(stIdx+1)%STATES.length; }
+    ctx.clearRect(0,0,W,H);
+
+    const pad=W*.05, sw=W*.2, sh=H*.1, sx=pad;
+    const ux=W*.38, uy=H*.12, uw=W*.24, uh=H*.76;
+    const ox=W*.72, ow=W*.23, oh=uh*.7, oy=uy+uh*.15;
+
+    // Grid
+    ctx.strokeStyle='rgba(23,29,36,.9)'; ctx.lineWidth=1;
+    for(let x=0;x<W;x+=W/14){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=H/10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    SENSORS.forEach((s,i)=>{
+      const sy = pad + i*(H-pad*2)/SENSORS.length + (H-pad*2)/SENSORS.length/2 - sh/2;
+      const cy = sy + sh/2;
+      const ucy = uy + (i+.5)*uh/SENSORS.length;
+
+      // Sensor box
+      ctx.fillStyle='rgba(10,13,16,.95)'; ctx.strokeStyle='rgba(30,40,48,1)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.rect(sx,sy,sw,sh); ctx.fill(); ctx.stroke();
+      // Label chip
+      ctx.fillStyle=s.color+'33'; ctx.fillRect(sx+2,sy+2,sw*.28,sh-4);
+      ctx.fillStyle=s.color; ctx.font=`700 ${W*.022}px 'JetBrains Mono'`; ctx.textAlign='center';
+      ctx.fillText(s.label, sx+sw*.14, sy+sh*.65);
+      ctx.fillStyle='#708090'; ctx.font=`${W*.018}px 'JetBrains Mono'`; ctx.textAlign='left';
+      ctx.fillText(s.name, sx+sw*.33, sy+sh*.65);
+
+      // Bezier line to unit
+      const lx0=sx+sw, lx1=ux;
+      ctx.setLineDash([3,5]); ctx.strokeStyle='rgba(30,40,48,1)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(lx0,cy);
+      ctx.bezierCurveTo(lx0+(lx1-lx0)*.45,cy, lx1-(lx1-lx0)*.45,ucy, lx1,ucy);
+      ctx.stroke(); ctx.setLineDash([]);
+
+      // Flow dot
+      flows[i].t += .005; if(flows[i].t>1)flows[i].t=0;
+      const ft=flows[i].t;
+      const fx=bez(lx0,lx0+(lx1-lx0)*.45,lx1-(lx1-lx0)*.45,lx1,ft);
+      const fy=bez(cy,cy,ucy,ucy,ft);
+      const fa=ft<.1?ft*10:ft>.9?(1-ft)*10:1;
+      ctx.beginPath(); ctx.arc(fx,fy,W*.014,0,6.28); ctx.fillStyle=`rgba(${hexRgb(s.color)},${fa*.8})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(fx,fy,W*.007,0,6.28); ctx.fillStyle=`rgba(255,255,255,${fa*.4})`; ctx.fill();
+    });
+
+    // OSREP unit
+    const pulse = .35+Math.sin(t*.05)*.12;
+    ctx.shadowColor='rgba(198,69,10,.5)'; ctx.shadowBlur=20;
+    ctx.strokeStyle=`rgba(198,69,10,${pulse})`; ctx.lineWidth=1.5;
+    ctx.fillStyle='rgba(10,13,16,.97)';
+    ctx.beginPath(); ctx.rect(ux,uy,uw,uh); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur=0;
+    // Inner gradient
+    const g=ctx.createLinearGradient(ux,uy,ux,uy+uh);
+    g.addColorStop(0,'rgba(198,69,10,.09)'); g.addColorStop(1,'rgba(198,69,10,.01)');
+    ctx.fillStyle=g; ctx.fillRect(ux+1,uy+1,uw-2,uh-2);
+    // Text
+    ctx.fillStyle='#C6450A'; ctx.font=`500 ${W*.018}px 'JetBrains Mono'`; ctx.textAlign='center';
+    ctx.fillText('edge unit', ux+uw/2, uy+uh*.18);
+    ctx.fillStyle='#EDF0EA'; ctx.font=`700 ${W*.052}px 'Syne'`;
+    ctx.fillText('OSREP', ux+uw/2, uy+uh*.42);
+    ctx.fillStyle='#3A4D5A'; ctx.font=`${W*.016}px 'JetBrains Mono'`;
+    ctx.fillText('on-unit inference', ux+uw/2, uy+uh*.58);
+    ctx.fillText('no cloud', ux+uw/2, uy+uh*.68);
+    // Blink dot
+    const bd=Math.sin(t*.1)>.2?1:.25;
+    ctx.beginPath(); ctx.arc(ux+uw/2,uy+uh*.82,W*.012,0,6.28);
+    ctx.fillStyle=`rgba(40,184,98,${bd})`; ctx.shadowColor='rgba(40,184,98,.8)'; ctx.shadowBlur=8*bd; ctx.fill(); ctx.shadowBlur=0;
+
+    // Arrow
+    const ax=ux+uw, ax2=ox;
+    ctx.strokeStyle='rgba(198,69,10,.65)'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(ax,uy+uh/2); ctx.lineTo(ax2-8,uy+uh/2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ax2-12,uy+uh/2-6); ctx.lineTo(ax2,uy+uh/2); ctx.lineTo(ax2-12,uy+uh/2+6);
+    ctx.strokeStyle='rgba(198,69,10,.9)'; ctx.stroke();
+
+    // State panel
+    const cst=STATES[stIdx];
+    ctx.fillStyle='rgba(10,13,16,.96)'; ctx.strokeStyle='rgba(30,40,48,1)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.rect(ox,oy,ow,oh); ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#3A4D5A'; ctx.font=`${W*.015}px 'JetBrains Mono'`; ctx.textAlign='center';
+    ctx.fillText('// current state', ox+ow/2, oy+oh*.16);
+    // Dot
+    const dc=oy+oh*.38, dd=W*.024;
+    ctx.beginPath(); ctx.arc(ox+ow/2,dc,dd,0,6.28);
+    ctx.fillStyle=cst.dot; ctx.shadowColor=cst.dot; ctx.shadowBlur=14; ctx.fill(); ctx.shadowBlur=0;
+    ctx.fillStyle=cst.dot; ctx.font=`700 ${W*.034}px 'Syne'`;
+    ctx.fillText(cst.label, ox+ow/2, oy+oh*.62);
+    ctx.fillStyle='#3A4D5A'; ctx.font=`${W*.013}px 'JetBrains Mono'`;
+    const since = stIdx===0?'stable · 14d':stIdx===1?'acoustic ↑40% · 3h':stIdx===2?'resolved · 4m':'fault · 2m';
+    ctx.fillText(since, ox+ow/2, oy+oh*.76);
+    // Update header
+    const hdr=$('#hdr-state');
+    if(hdr){ hdr.textContent=cst.label.toLowerCase(); hdr.className='th-val '+cst.cls; }
+
+    raf=requestAnimationFrame(tick);
+  }
+
+  function hexRgb(h){return `${parseInt(h.slice(1,3),16)},${parseInt(h.slice(3,5),16)},${parseInt(h.slice(5,7),16)}`;}
+
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAnimationFrame(raf);else raf=requestAnimationFrame(tick);});
+  window.addEventListener('resize',()=>{resize();},{passive:true});
+  resize(); raf=requestAnimationFrame(tick);
+})();
+
+/* ── HOW CANVAS (step visualizer) ── */
+(function () {
+  const cv = $('#how-cv');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  let W, H, raf, t=0, activeStep=0, lastInteraction=0, autoTimer=null;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = cv.getBoundingClientRect();
+    W = rect.width > 2 ? rect.width : (cv.offsetWidth || 400);
+    H = W * .75;
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function init() {
+    resize();
+    if (W < 4) { requestAnimationFrame(init); return; }
+    raf = requestAnimationFrame(tick);
+    startAuto();
+  }
+
+  const scenes = [
+    // Scene 0: Mount — sensors left, unit right, bezier wires, no overlap
+    function(t) {
+      ctx.clearRect(0,0,W,H);
+      drawGrid();
+
+      const LABELS = ['USN','ACC','TMP','PSI','AMP'];
+      const NAMES  = ['Ultrasound','Accelerometer','Temperature','Pressure','Current'];
+      const COLORS = ['#C6450A','#C6450A','#28A0C0','#28A0C0','#C09818'];
+
+      const sBoxW = W * .24;
+      const sBoxH = H * .11;
+      const sBoxX = W * .03;
+      const vPad  = H * .07;
+      const usable = H - vPad * 2;
+      const slot   = usable / LABELS.length;
+
+      const uX = W * .65;
+      const uW = W * .30;
+      const uH = H * .80;
+      const uY = (H - uH) / 2;
+
+      LABELS.forEach((lbl, i) => {
+        const progress = clamp((t - i * 18) / 55, 0, 1);
+        if (progress <= 0) return;
+
+        const sCY = vPad + slot * i + slot / 2;
+        const sRX = sBoxX + sBoxW;
+        const wireY = uY + uH * ((i + .5) / LABELS.length);
+        const cp1x = sRX + (uX - sRX) * .45;
+        const cp2x = uX - (uX - sRX) * .45;
+
+        // Wire
+        ctx.setLineDash([3, 5]);
+        ctx.strokeStyle = 'rgba(' + hexRgb(COLORS[i]) + ',' + (progress * .4) + ')';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(sRX, sCY);
+        ctx.bezierCurveTo(cp1x, sCY, cp2x, wireY, uX, wireY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Flow dot
+        const ft = ((t * .006 + i * .22) % 1);
+        const fa = ft < .1 ? ft * 10 : ft > .88 ? (1 - ft) * 8 : 1;
+        const fdx = bez4(sRX, cp1x, cp2x, uX, ft);
+        const fdy = bez4(sCY, sCY, wireY, wireY, ft);
+        ctx.beginPath();
+        ctx.arc(fdx, fdy, W * .012, 0, 6.28);
+        ctx.fillStyle = 'rgba(' + hexRgb(COLORS[i]) + ',' + (fa * progress * .8) + ')';
+        ctx.fill();
+
+        // Sensor box
+        const bx = sBoxX, by = sCY - sBoxH / 2;
+        ctx.fillStyle = 'rgba(10,13,16,' + progress + ')';
+        ctx.strokeStyle = 'rgba(30,40,48,' + progress + ')';
+        ctx.lineWidth = 1;
+        ctx.fillRect(bx, by, sBoxW, sBoxH);
+        ctx.strokeRect(bx, by, sBoxW, sBoxH);
+
+        // Color chip
+        ctx.fillStyle = 'rgba(' + hexRgb(COLORS[i]) + ',.14)';
+        ctx.fillRect(bx + 1, by + 1, sBoxW * .26, sBoxH - 2);
+
+        // Label + name
+        ctx.fillStyle = 'rgba(' + hexRgb(COLORS[i]) + ',' + progress + ')';
+        ctx.font = '700 ' + (W * .019) + 'px JetBrains Mono';
+        ctx.textAlign = 'center';
+        ctx.fillText(lbl, bx + sBoxW * .13, sCY + W * .007);
+        ctx.fillStyle = 'rgba(112,128,144,' + progress + ')';
+        ctx.font = (W * .015) + 'px JetBrains Mono';
+        ctx.textAlign = 'left';
+        ctx.fillText(NAMES[i], bx + sBoxW * .3, sCY + W * .006);
+      });
+
+      // Unit
+      const up = clamp((t - 32) / 45, 0, 1);
+      drawUnit(uX, uY, uW, uH, up, t);
+
+      function bez4(p0,p1,p2,p3,t){const m=1-t;return m*m*m*p0+3*m*m*t*p1+3*m*t*t*p2+t*t*t*p3;}
+    },
+    // Scene 1: Learn — shows waveform + model forming
+    function(t) {
+      ctx.clearRect(0,0,W,H);
+      drawGrid();
+      // Waveform building
+      ctx.strokeStyle='rgba(198,69,10,.7)'; ctx.lineWidth=1.5;
+      ctx.beginPath();
+      const pts=Math.floor(clamp(t/2,0,W));
+      for(let i=0;i<pts;i++){
+        const x=(i/W)*W;
+        const y=H*.5+Math.sin(i*.18)*H*.15+Math.sin(i*.41)*.08*H+Math.sin(i*.9)*.05*H+(Math.random()-.5)*4;
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.stroke();
+      // Model confidence bar
+      const conf=clamp(t/120,0,1);
+      ctx.fillStyle='rgba(14,18,24,.9)'; ctx.fillRect(W*.1,H*.72,W*.8,H*.08);
+      ctx.fillStyle='rgba(198,69,10,.8)'; ctx.fillRect(W*.1,H*.72,W*.8*conf,H*.08);
+      ctx.strokeStyle='rgba(30,40,48,1)'; ctx.lineWidth=1; ctx.strokeRect(W*.1,H*.72,W*.8,H*.08);
+      ctx.fillStyle='#708090'; ctx.font=`${W*.016}px 'JetBrains Mono'`; ctx.textAlign='left';
+      ctx.fillText('model confidence', W*.1, H*.68);
+      ctx.textAlign='right'; ctx.fillStyle='#C6450A';
+      ctx.fillText(Math.round(conf*100)+'%', W*.9, H*.68);
+      // Label
+      ctx.fillStyle='rgba(198,69,10,.6)'; ctx.font=`${W*.018}px 'JetBrains Mono'`; ctx.textAlign='center';
+      ctx.fillText('learning baseline on-unit', W*.5, H*.2);
+      ctx.fillStyle='#3A4D5A'; ctx.font=`${W*.014}px 'JetBrains Mono'`;
+      ctx.fillText('no data transmitted', W*.5, H*.28);
+    },
+    // Scene 2: Emit — shows state output cycling
+    function(t) {
+      ctx.clearRect(0,0,W,H);
+      drawGrid();
+      // Timeline of states
+      const states2=[
+        {label:'Nominal',  color:'#28B862', len:.5},
+        {label:'Degrading',color:'#C09818', len:.2},
+        {label:'Nominal',  color:'#28B862', len:.3},
+      ];
+      let xOff=W*.05;
+      states2.forEach(s=>{
+        const sw=(W*.9)*s.len;
+        const prog=clamp((t-30)/80,0,1);
+        ctx.fillStyle=s.color+'18'; ctx.fillRect(xOff,H*.3,sw*prog,H*.35);
+        ctx.strokeStyle=s.color+'60'; ctx.lineWidth=1; ctx.strokeRect(xOff,H*.3,sw,H*.35);
+        ctx.fillStyle=s.color; ctx.font=`700 ${W*.026}px 'Syne'`; ctx.textAlign='center';
+        if(prog>.3)ctx.fillText(s.label, xOff+sw/2, H*.51);
+        xOff+=sw;
+      });
+      // Arrow + state box
+      const p2=clamp((t-60)/40,0,1);
+      if(p2>0){
+        ctx.strokeStyle=`rgba(198,69,10,${p2*.7})`; ctx.lineWidth=1.5;
+        ctx.beginPath(); ctx.moveTo(W*.5,H*.72); ctx.lineTo(W*.5,H*.82); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(W*.44,H*.79); ctx.lineTo(W*.5,H*.86); ctx.lineTo(W*.56,H*.79); ctx.stroke();
+        ctx.fillStyle=`rgba(14,18,24,${p2})`; ctx.strokeStyle=`rgba(198,69,10,${p2*.5})`;
+        ctx.fillRect(W*.3,H*.86,W*.4,H*.1); ctx.strokeRect(W*.3,H*.86,W*.4,H*.1);
+        ctx.fillStyle=`rgba(40,184,98,${p2})`; ctx.font=`700 ${W*.022}px 'JetBrains Mono'`; ctx.textAlign='center';
+        ctx.fillText('→ upstream', W*.5, H*.93);
+      }
+      ctx.fillStyle='#3A4D5A'; ctx.font=`${W*.014}px 'JetBrains Mono'`; ctx.textAlign='center';
+      ctx.fillText('state timeline · asset 04', W*.5, H*.22);
+    }
+  ];
+
+  function drawGrid(){
+    ctx.strokeStyle='rgba(23,29,36,.8)'; ctx.lineWidth=1;
+    for(let x=0;x<W;x+=W/14){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=H/10){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  }
+
+  function drawUnit(x,y,w,h,alpha,t){
+    const pulse=.3+Math.sin(t*.05)*.1;
+    ctx.shadowColor='rgba(198,69,10,.5)'; ctx.shadowBlur=16*alpha;
+    ctx.strokeStyle=`rgba(198,69,10,${pulse*alpha})`; ctx.lineWidth=1.5;
+    ctx.fillStyle=`rgba(10,13,16,${alpha*.98})`;
+    ctx.beginPath(); ctx.rect(x,y,w,h); ctx.fill(); ctx.stroke(); ctx.shadowBlur=0;
+    if(alpha>.5){
+      ctx.fillStyle=`rgba(198,69,10,${alpha})`; ctx.font=`600 ${W*.016}px 'JetBrains Mono'`; ctx.textAlign='center';
+      ctx.fillText('OSREP', x+w/2, y+h*.45);
+      ctx.fillStyle=`rgba(56,77,90,${alpha})`; ctx.font=`${W*.013}px 'JetBrains Mono'`;
+      ctx.fillText('on-unit', x+w/2, y+h*.6);
+    }
+  }
+
+  let sceneT=0;
+  function tick(){
+    t++; sceneT++;
+    scenes[activeStep](sceneT);
+    raf=requestAnimationFrame(tick);
+  }
+
+  // STEP INTERACTION — hover activates, not just click
+  let idleTimer=null;
+  function setStep(i){
+    if(activeStep===i)return;
+    activeStep=i; sceneT=0;
+    $$('.step').forEach((s,j)=>{ s.classList.toggle('on',j===i); s.setAttribute('aria-expanded',j===i); });
+    clearTimeout(idleTimer);
+    lastInteraction=Date.now();
+    // Resume auto after 8s idle
+    idleTimer=setTimeout(startAuto, 8000);
+  }
+
+  function startAuto(){
+    clearInterval(autoTimer);
+    autoTimer=setInterval(()=>{
+      if(Date.now()-lastInteraction>6000) setStep((activeStep+1)%3);
+    }, 4000);
+  }
+
+  $$('.step').forEach((step,i)=>{
+    // Hover activates
+    step.addEventListener('mouseenter',()=>{ lastInteraction=Date.now(); setStep(i); });
+    // Click also works
+    step.addEventListener('click',()=>{ lastInteraction=Date.now(); setStep(i); });
+    step.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();setStep(i);} });
+  });
+
+  document.addEventListener('visibilitychange',()=>{ if(document.hidden)cancelAnimationFrame(raf); else raf=requestAnimationFrame(tick); });
+  window.addEventListener('resize',()=>{ resize(); },{passive:true});
+  if (window.ResizeObserver) { new ResizeObserver(()=>{ resize(); }).observe(cv); }
+  // Defer init until canvas has layout
+  if (document.readyState === 'complete') { setTimeout(init, 50); }
+  else { window.addEventListener('load', ()=>setTimeout(init, 50)); }
+})();
+
+/* ── INPUT CARD GLOW ── */
+$$('.ic').forEach(c=>{
+  c.addEventListener('mousemove',e=>{
+    const r=c.getBoundingClientRect();
+    c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+    c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+  });
+});
+
+/* ── FORM ── */
+(function(){
+  const form=$('#cform'), ok=$('#form-ok'), btn=form.querySelector('.sub-btn');
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    const hp=form.querySelector('[name="_gotcha"]'); if(hp&&hp.value)return;
+    const fields=[['fn',form.name.value.trim()],['fe',form.email.value.trim()],['fi',form.industry.value],['fw',form.what.value.trim()]];
+    let err=false;
+    fields.forEach(([id,v])=>{
+      const el=document.getElementById(id);
+      if(!v){el.style.borderColor='var(--red)';el.style.borderBottomColor='var(--red)';el.setAttribute('aria-invalid','true');err=true;}
+      else{el.style.borderColor='';el.style.borderBottomColor='';el.removeAttribute('aria-invalid');}
+    });
+    if(err)return;
+    btn.disabled=true; const orig=btn.innerHTML; btn.innerHTML='Sending…';
+    try{
+      const res=await fetch(form.action,{method:'POST',headers:{Accept:'application/json'},body:new FormData(form)});
+      if(res.ok){ok.classList.add('show');btn.innerHTML='✓ Sent';form.querySelectorAll('input,select,textarea').forEach(el=>el.disabled=true);}
+      else{const d=await res.json().catch(()=>({}));btn.disabled=false;btn.innerHTML=orig;ok.innerHTML=`<strong style="color:var(--red)">✕ Something went wrong.</strong> Try again.${d.error?` (${d.error})`:''}`;ok.style.borderColor='var(--red)';ok.classList.add('show');}
+    }catch{btn.disabled=false;btn.innerHTML=orig;ok.innerHTML='<strong style="color:var(--red)">✕ Network error.</strong>';ok.style.borderColor='var(--red)';ok.classList.add('show');}
+  });
+})();
+</script>
+</body>
+</html>
