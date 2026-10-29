@@ -1,0 +1,110 @@
+<!doctype html>
+<!--
+  OSREP · osrep.ai · 2026
+  Pages: / (home), /team. Shared files in /assets:
+    site.css    all tokens and components (token notes live at its top)
+    jbm.woff2   JetBrains Mono variable, subset, preloaded on every page
+    logo.webp, garrett.webp, andres.webp
+  Each page is static HTML with no framework. The contact form posts to
+  Formspree and works without JS; the script on / adds inline errors.
+  To add a page: copy team.html, swap <title>, description, canonical,
+  og:url and <main>, set aria-current="page" on its nav link, and add
+  the link to the nav on every page.
+
+  DEPLOY (GitHub Pages)
+    · Upload index.html, team.html, the assets/ folder, og-image.png,
+      favicon.png, apple-touch-icon.png. Delete /favicon.svg.
+    · /team is served from team.html automatically.
+    · Formspree endpoint unchanged (f/mgorpzll). Submit a test entry
+      after deploy; finish domain verification for hello@osrep.ai.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Our team | OSREP</title>
+<meta name="description" content="The people building OSREP: edge units that return one continuous machine state from the sensors already wired to your equipment. Based in Baton Rouge, Louisiana.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://osrep.ai/team">
+<meta name="theme-color" content="#07090C">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://osrep.ai/team">
+<meta property="og:title" content="Our team | OSREP">
+<meta property="og:description" content="Edge units read the sensors already wired to your equipment and return one continuous machine state. Inference on the unit. No raw data leaves your site.">
+<meta property="og:image" content="https://osrep.ai/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="OSREP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Our team | OSREP">
+<meta name="twitter:description" content="Edge units read the sensors already wired to your equipment and return one continuous machine state. Inference on the unit. No raw data leaves your site.">
+<meta name="twitter:image" content="https://osrep.ai/og-image.png">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/assets/jbm.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head" id="top">
+  <div class="wrap">
+    <a class="wordmark" href="/"><img src="/assets/logo.webp" alt="OSREP home" width="153" height="36"></a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/#problem">The problem</a>
+      <a href="/#approach">How it works</a>
+      <a href="/#status">Where this stands</a>
+      <a href="/team" aria-current="page">Our team</a>
+    </nav>
+    <a class="head-cta" href="/#contact">Request a site assessment</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-top">
+    <div class="wrap">
+      <div class="section-head">
+        <h1>Who you'd be working with.</h1>
+        <p class="lede">Two founders build and sell the product, with a third on cybersecurity and nine industry and academic consultants behind them. All based in Baton Rouge.</p>
+      </div>
+      <div class="team">
+      <div class="founder">
+        <img class="photo-round" src="/assets/garrett.webp" alt="Garrett Wainright" width="262" height="262">
+        <div>
+          <h3>Garrett Wainright</h3>
+          <p class="role">Chief executive, co-founder</p>
+          <p>Runs the commercial side and sets product direction: customer and data-partner conversations, and what the unit has to prove at a site before anyone buys it. Reads every request that comes through this page.</p>
+          <p>Economics degree from LSU, now a master's in computer science there, and a Dean's AI Fellow in the College of Engineering. Before OSREP he led a student engineering team on a rail yard tracking automation project for Shell and built product prototypes at Pellerin Technology.</p>
+          <p><a href="https://www.linkedin.com/in/garrett-wainright-01abb6214" rel="me">Garrett on LinkedIn</a></p>
+        </div>
+      </div>
+      <div class="founder">
+        <img class="photo-round" src="/assets/andres.webp" alt="Andres Borer" width="300" height="300" loading="lazy" decoding="async">
+        <div>
+          <h3>Andres Borer</h3>
+          <p class="role">Co-founder, embedded systems lead</p>
+          <p>Builds the Orca unit: firmware, sensor interfaces, and the protocol layer that moves a machine state off the hardware and into your plant systems.</p>
+          <p>Honors computer engineering at LSU. Before OSREP he wrote embedded networking firmware for marine displays at Controles Nacionales in Panama. On LSU's rocketry team he fuses IMU and barometer data to hold a clean state estimate under heavy vibration, the same problem a sensor on a running pump has.</p>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap next">
+      <p>Want to know whether OSREP fits your assets?</p>
+      <a class="btn" href="/#contact">Request a site assessment</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <p>OSREP LLC © 2026. Baton Rouge, Louisiana.</p>
+    <p><a href="/#contact">Request a site assessment</a> · <a href="#top">Back to top</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
